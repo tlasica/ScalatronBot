@@ -2,23 +2,36 @@
  * Created by tomek on 11.01.15.
  */
 class ControlFunctionFactory {
-  def create = (input:String) => {
+  def create = new BotManager().respond _
+}
+
+// TODO: it may be a good choice to let master pass react to it's mini bots (manager should be eliminated)
+
+class BotManager {
+
+  var master: Bot = new Bot
+
+  def respond(input: String) = {
     try {
       val cmd = ServerCommandParser.parse(input)
+      cmd match {
+        case w: WelcomeCmd =>
+          println("New round " + w.round.toString + " started")
+          master = new RandomMoveBot
+          ""
+        case r: ReactCmd =>
+          master.react(r)
+        case g: GoodbyeCmd =>
+          println("Goodbye with energy:" + g.energy.toString)
+          master stop
+      }
     }
     catch {
-      case _ => println(input)
-
+      case e:Throwable =>
+        println("Fuck! " + e.getMessage())
+        e.printStackTrace
+             // TODO: Logging
     }
-
-    //val cmd = ServerCommandParser.parse(input)
-//    val resp = cmd match {
-//      //case w: Welcome => "Status(text=Welcome!)"
-//      //rcase r: React => s"Status(text=$r.time)"
-//      case g: Goodbye => "Status(text=bye)"
-//      case _ => "DUPA!"
-//    }
-    "Status(text=dupa)"
   }
 
 

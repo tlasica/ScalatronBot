@@ -2,14 +2,17 @@
  * Created by tomek on 12.01.15.
  */
 
-case class Coord(x: Int, y: Int)
-
-abstract class ServerCommand {
+case class Coord(x: Int, y: Int) {
 }
 
-object ServerCommand {
-  type BotState = Map[String, String]
+object Coord {
+  def fromString(s: String) = {
+    val xy = s.split(":")
+    Coord(xy(1).toInt, xy(2).toInt)
+  }
 }
+
+abstract class ServerCommand
 
 /**
  * "Welcome" is the first command sent by the server to a plug-in before any other invocations of the control function.
@@ -18,22 +21,43 @@ object ServerCommand {
  * @param round  the index of the round for which the control function was instantiated.
  * @param maxSlaves the number of slave bots that a user can have alive at any one time
  */
-case class Welcome(name: String,
+case class WelcomeCmd(name: String,
                    apocalypse: Int,
                    round: Int,
                    maxSlaves: Int) extends ServerCommand
 
 
-case class React(generation: Int,
-                 name:String,
-                 time:Int,
-                 view: String,
-                 energy: Int,
-                 masterPos: Coord,
-                 collision: Coord,
-                 slavesAlive: Int,
-                 state: ServerCommand.BotState) extends ServerCommand
+case class ReactCmd(params: Map[String, String]) extends ServerCommand {
 
-case class Goodbye(energy: Int) extends ServerCommand
+  def generation = params.getOrElse("generation", "0").toInt
+
+  def name = params.getOrElse("name", "???")
+
+  def time = params("time").toInt
+
+  def energy = params("energy").toInt
+
+  def masterPosition: Option[Coord] = params.get("master") match {
+    case Some(x: String) => Some(Coord.fromString(x))
+    case None => None
+  }
+
+  def collision: Option[Coord] = params.get("collision") match {
+    case Some(x: String) => Some(Coord.fromString(x))
+    case None => None
+  }
+
+  def view: Option[BotView] = params.get("view") match {
+    case Some(x: String) => Some(BotView(x))
+    case None => None
+  }
+
+  //TODO: view
+  //TODO: slavesAlive
+  //TODO: state
+
+}
+
+case class GoodbyeCmd(energy: Int) extends ServerCommand
 
 

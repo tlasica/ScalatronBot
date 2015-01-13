@@ -24,34 +24,25 @@ object ServerCommandParser {
   def tokenize(input: String): ParsedCommand = {
     val tokens = input.split("\\(|\\)|\\,")
     val optcode = tokens(0)
-    val paramPairs = tokens.drop(1) map ((x: String) => x.split("="))
+    val params = tokens.toList drop 1
+    val paramPairs = params map ((x: String) => x.split("="))
     val paramsMap = paramPairs groupBy(_(0)) mapValues (_(0)(1))
     ParsedCommand(optcode, paramsMap)
   }
 
   private def parseWelcome(cmd: ParsedCommand): ServerCommand = {
-    Welcome(
+    WelcomeCmd(
       name = cmd.getString("name"),
       apocalypse = cmd.getInt("apocalypse"),
       round = cmd.getInt("round"),
-      maxSlaves = cmd.getInt("maxslaves") )
+      maxSlaves = cmd.getInt("maxslaves") ) // TODO: do poprawienia na Option
   }
 
   private def parseReact(cmd: ParsedCommand): ServerCommand = {
-    React(
-      generation = cmd.getInt("generation"),
-      name = cmd.getString("name"),
-      time = cmd.getInt("time"),
-      view = cmd.getString("view"),
-      energy = cmd.getInt("energy"),
-      masterPos = cmd.getCoord("master"),
-      collision = cmd.getCoord("collision"),
-      slavesAlive = cmd.getInt("slaves"),
-      state = cmd.params
-    )
+    ReactCmd( cmd.params )
   }
 
   private def parseGoodbye(cmd: ParsedCommand): ServerCommand = {
-    Goodbye(energy = cmd.getInt("energy"))
+    GoodbyeCmd(energy = cmd.getInt("energy"))
   }
 }
