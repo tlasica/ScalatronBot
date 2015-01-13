@@ -28,10 +28,12 @@ case class React(generation: Int,
                  name:String,
                  time:Int,
                  view: String,
-                 energy: String,
+                 energy: Int,
                  masterPos: Coord,
                  collision: Coord,
-                 slaves: Int,
-                  state: ServerCommand.BotState) extends ServerCommand
+                 slavesAlive: Int,
+                 state: ServerCommand.BotState) extends ServerCommand
 
 case class Goodbye(energy: Int) extends ServerCommand
+
+

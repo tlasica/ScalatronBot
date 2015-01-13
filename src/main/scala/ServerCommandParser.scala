@@ -3,7 +3,14 @@
  */
 object ServerCommandParser {
 
-  case class ParsedCommand(optcode: String, params:Map[String, String])
+  case class ParsedCommand(optcode: String, params:Map[String, String]) {
+    def getInt(key: String) = params.getOrElse(key, "0").toInt
+    def getString(key: String) = params(key)
+    def getCoord(key: String): Coord = {
+      val xy = params(key).split(":")
+      Coord(xy(1).toInt, xy(2).toInt)
+    }
+  }
 
   def parse(input: String): ServerCommand = {
     val parsedCmd = tokenize(input)
@@ -22,9 +29,29 @@ object ServerCommandParser {
     ParsedCommand(optcode, paramsMap)
   }
 
-  private def parseWelcome(command: ParsedCommand): ServerCommand = ???
+  private def parseWelcome(cmd: ParsedCommand): ServerCommand = {
+    Welcome(
+      name = cmd.getString("name"),
+      apocalypse = cmd.getInt("apocalypse"),
+      round = cmd.getInt("round"),
+      maxSlaves = cmd.getInt("maxslaves") )
+  }
 
-  private def parseReact(command: ParsedCommand): ServerCommand = ???
+  private def parseReact(cmd: ParsedCommand): ServerCommand = {
+    React(
+      generation = cmd.getInt("generation"),
+      name = cmd.getString("name"),
+      time = cmd.getInt("time"),
+      view = cmd.getString("view"),
+      energy = cmd.getInt("energy"),
+      masterPos = cmd.getCoord("master"),
+      collision = cmd.getCoord("collision"),
+      slavesAlive = cmd.getInt("slaves"),
+      state = cmd.params
+    )
+  }
 
-  private def parseGoodbye(command: ParsedCommand): ServerCommand = ???
+  private def parseGoodbye(cmd: ParsedCommand): ServerCommand = {
+    Goodbye(energy = cmd.getInt("energy"))
+  }
 }
