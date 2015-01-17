@@ -4,21 +4,19 @@
 case class BotView(str: String) {
 
   // Master Bot view is 31x31, mini-bot view is 21x21
-  require(str.length==31*31 || str.length==21*21)
+  require(str.length==BotView.MasterViewNumCells || str.length==BotView.MiniViewNumCells)
 
-  private def size = if (str.length == 31*31) 15 else 10
-  private def rowSize = if (str.length == 31*31) 31 else 21
+  def size = if (str.length == 31*31) 31 else 21
 
-  // -15..15 or -10..10
-  def at(x: Int, y: Int) = {
-    val row = y + 15
-    val col = x + 15
-    val idx = row * rowSize + col
-    if (idx >= 961) {
-      println ("x:" + x + " y:" + y)
-    }
+  // 0..30 x 0.30, (0,0) upper left corner
+  def at(row: Int, col: Int) = {
+    require(row>=0 && row<size)
+    require(col>=0 && col<size)
+    val idx = row * size + col
     str(idx)
   }
+
+  override def toString(): String = str
 }
 
 object BotView {
@@ -27,10 +25,21 @@ object BotView {
   val Wall = 'W'
   val Master = 'M'
   val EnemyMaster = 'm'
+  val Mini = 'S'
+  val EnemyMini = 's'
   val Zugar = 'P'
   val Toxifera = 'p'
-  val Flupper = 'B'
+  val Fluppet = 'B'
   val Snorg = 'b'
+
+  val MasterPos = Coord(15,15)
+  val MiniPos = Coord(10,10)
+
+  val MasterviewSize = 31
+  val MiniViewSize = 21
+
+  val MasterViewNumCells = MasterviewSize * MasterviewSize
+  val MiniViewNumCells = MiniViewSize * MiniViewSize
 
 }
 

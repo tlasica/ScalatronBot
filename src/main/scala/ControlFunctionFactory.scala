@@ -17,7 +17,7 @@ class BotManager {
       cmd match {
         case w: WelcomeCmd =>
           println("New round " + w.round.toString + " started")
-          master = new RandomMoveBot
+          master = new GoalFunDrivenBot
           ""
         case r: ReactCmd =>
           master.react(r)

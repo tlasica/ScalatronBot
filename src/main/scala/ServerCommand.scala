@@ -2,13 +2,21 @@
  * Created by tomek on 12.01.15.
  */
 
-case class Coord(x: Int, y: Int) {
+case class Coord(row: Int, col: Int) {
+
+  def isBackOf(m: Coord): Boolean =  {
+    if (row == -m.row && col == -m.col) true else false
+  }
+
+  def moveTo(dest: Coord): Coord = {
+    Coord(dest.row-this.row, dest.col-this.col)
+  }
 }
 
 object Coord {
   def fromString(s: String) = {
-    val xy = s.split(":")
-    Coord(xy(1).toInt, xy(2).toInt)
+    val c = s.split(":")
+    Coord(c(0).toInt, c(1).toInt)
   }
 }
 
