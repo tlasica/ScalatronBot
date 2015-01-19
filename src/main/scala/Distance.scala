@@ -11,12 +11,19 @@ object Distance {
   }
   */
 
-  def neighbours(row: Int, col: Int, size:Int): List[(Int, Int)] = {
-    for {
+  def directions: List[Coord] = {
+    for{
       dr <-List(-1, 0, 1)
       dc <-List(-1, 0, 1)
-      nr = row + dr
-      nc = col + dc
+      if dr!=0 || dc!=0
+    } yield Coord(dr, dc)
+  }
+
+  def neighbours(row: Int, col: Int, size:Int): List[(Int, Int)] = {
+    for {
+      dir <- directions
+      nr = row + dir.row
+      nc = col + dir.col
       if nr >= 0 && nr < size
       if nc >= 0 && nc < size
     } yield(nr, nc)

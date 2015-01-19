@@ -8,8 +8,12 @@ case class Coord(row: Int, col: Int) {
     if (row == -m.row && col == -m.col) true else false
   }
 
-  def moveTo(dest: Coord): Coord = {
+  def findMoveTo(dest: Coord): Coord = {
     Coord(dest.row-this.row, dest.col-this.col)
+  }
+
+  def add(move: Coord): Coord = {
+    new Coord(row + move.row, col + move.col)
   }
 }
 

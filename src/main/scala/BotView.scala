@@ -16,7 +16,19 @@ case class BotView(str: String) {
     str(idx)
   }
 
+  def at(coord: Coord): Char = at(coord.row, coord.col)
+
+  def isPositionCorrect(coord: Coord): Boolean = {
+    (coord.row>=0 && coord.row<size) && (coord.col>=0 && coord.col<size)
+  }
+
   override def toString(): String = str
+
+  def toPrettyString(): String = {
+    val withIndex = str.zipWithIndex
+    val rows = withIndex map ( ci => if ((ci._2+1) % size == 0) ci._1 + "\n" else ci._1 )
+    rows.mkString
+  }
 }
 
 object BotView {
@@ -40,6 +52,16 @@ object BotView {
 
   val MasterViewNumCells = MasterviewSize * MasterviewSize
   val MiniViewNumCells = MiniViewSize * MiniViewSize
+
+  def isSafe(cell: Char): Boolean = {
+    cell match {
+      case BotView.Wall => false
+      case BotView.EnemyMaster => false
+      case BotView.Toxifera => false
+      case BotView.Snorg => false
+      case _ => true
+    }
+  }
 
 }
 
