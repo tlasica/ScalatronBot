@@ -33,7 +33,7 @@ case class BotView(str: String) {
 
 object BotView {
   val Hidden = '?'
-  val Empty = '-'
+  val Empty = '_'
   val Wall = 'W'
   val Master = 'M'
   val EnemyMaster = 'm'

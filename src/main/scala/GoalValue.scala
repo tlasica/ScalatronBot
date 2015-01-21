@@ -3,26 +3,27 @@
  */
 object GoalValue {
 
-  private def distanceValue(d: Int): Int = {
-    (31-d)*(31-d)
+  // 0..100
+  private def distanceValue(d: Int): Long = {
+    scala.math.round(100.0 * ((31-d)*(31-d) / (31.0*31.0) ) )
   }
 
 
   //  map ((x:Int) => BotView.MasterviewSize-x)
-  private def cellValue(cell: Char, dist: Int) : Int = {
+  private def cellValue(cell: Char, dist: Int) : Long = {
     cell match {
-      case BotView.Wall =>
-        if (dist == 0) -10 * distanceValue(dist)
-        if (dist < 4) -6 * distanceValue(dist)
-        else 0
+//      case BotView.Wall =>
+//        if (dist == 0) -1000
+//        if (dist < 4) -33
+//        else 0
       case BotView.Master => 0
       case BotView.EnemyMaster => -100 * distanceValue(dist)
       case BotView.EnemyMini => -300 * distanceValue(dist)
-      case BotView.Zugar => if (dist==0) 500000 else 100 * distanceValue(dist)
+      case BotView.Zugar => if (dist==0) 200000 else 150 * distanceValue(dist)
       case BotView.Toxifera => if (dist>0) 0 else -100 * distanceValue(dist)
-      case BotView.Fluppet => if (dist==0) 500000 else 70 * distanceValue(dist)
-      case BotView.Snorg => -150 * distanceValue(dist)
-      case BotView.Empty => 2 * dist*dist
+      case BotView.Fluppet => if (dist==0) 500000 else 200 * distanceValue(dist)
+      case BotView.Snorg => if (dist==0) -300000 else -150 * distanceValue(dist)
+      //case BotView.Empty => 1
       case _ => 0
     }
   }
@@ -33,7 +34,7 @@ object GoalValue {
     Array.tabulate(view.size, view.size)( (x,y) => groundLine(x*view.size + y) )
   }
 
-  def forView(view: BotView, pos: Coord): Int = {
+  def forView(view: BotView, pos: Coord): Long = {
     val ground = groundFromView(view)
     val distanceXY = Distance.calculateDistanceArray(ground, pos.row, pos.col)
     val distanceVector = distanceXY.flatten

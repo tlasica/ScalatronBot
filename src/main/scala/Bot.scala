@@ -11,51 +11,34 @@ class Bot {
   // coordinates in Moves are (x, y) from top left
   def moveCmd(coord: Coord): String = "Move(direction=" + coord.col  + ":" + coord.row + ")"
 
-
-
 }
 
 object Bot {
-  def isBackMove(last: Coord, curr: Coord) : Boolean = {
-    if (curr.row == -last.row && curr.col == -last.col) true else false
-  }
 
 }
 
-class RandomMoveBot extends Bot {
+trait DebugPrint {
+  def debug(in: String)
+  def clearDebug()
+  def printDebug()
+}
 
-  import scala.collection.mutable.Queue
+trait SimpleDebugPrint extends DebugPrint {
+  val d: StringBuilder = new StringBuilder
+  override def debug(in: String) { d ++= in + "\n" }
+  override def clearDebug() { d.clear() }
+  override def printDebug() { println( d.toString() ) }
+}
 
-  var lastMove: Coord = Coord(0,0)
-
-  override def react(reactCmd: ReactCmd): String = {
-
-    def isAcceptable(m: Coord): Boolean = {
-      if (m.isBackOf(lastMove)) false
-      else reactCmd.view match {
-        case Some(v) =>
-          val cell = v.at(m.row, m.col)
-          BotView.isSafe(cell)
-        case None => true
-      }
-    }
-
-    val move = randomMove
-    if (isAcceptable(move)) {
-      lastMove = move
-      moveCmd(move)
-    }
-    else react(reactCmd)  // try again
-  }
-
-  private def randomMove: Coord = {
-    val dx = scala.util.Random.nextInt(3)-1
-    val dy = scala.util.Random.nextInt(3)-1
-    Coord(dx, dy)
-  }
+trait NoDebugPrint extends DebugPrint {
+  override def debug(in: String) {/* noop */}
+  override def clearDebug() {/* noop */}
+  override def printDebug() {/* noop */}
 }
 
 class GoalFunDrivenBot extends Bot {
+
+  this: DebugPrint =>
 
   var lastMove: Coord = Coord(0,0)
 
@@ -65,6 +48,7 @@ class GoalFunDrivenBot extends Bot {
     val cmd =
     if (escape.nonEmpty) {
       val move = escape.dequeue()
+      lastMove = move
       moveCmd(move)
     }
     else {
@@ -74,11 +58,10 @@ class GoalFunDrivenBot extends Bot {
   }
 
   def moveForBestValue(reactCmd: ReactCmd): String = {
-    val cmd = reactCmd.view match {
+    val move = reactCmd.view match {
       case Some(view) =>
-        val debug = new StringBuilder
         var bestValue = GoalValue.forView( view, BotView.MasterPos )
-        debug ++= "current val:" + bestValue + "\n"
+        debug("current val:" + bestValue)
         val sit = GoalValue.situation(view, 15, 15)
         val nbours = Distance.neighbours(15, 15, 31)
         var bestMove = Coord(0, 0)
@@ -89,32 +72,37 @@ class GoalFunDrivenBot extends Bot {
           //println("considering move by " + move + " to " + newPos)
           if (! move.isBackOf(lastMove)) {
             val value = GoalValue.forView(view, newPos)
-            debug ++= "move by " + move + " will lead to " + value + "\n"
-            debug ++= "-> " + GoalValue.situation(view, newPos.row, newPos.col) + "\n"
+            debug( "move by " + move + " will lead to " + value + " and situation:")
+            debug( GoalValue.situation(view, newPos.row, newPos.col).mkString("\n"))
             if (value >= bestValue) {
               bestMove = move
               bestValue = value
             }
           }
         }
+        // print debug info
+        debug("=======================")
+        debug(sit.mkString("\n"))
         // if decided to stay and not to move we switch to escape mode
-        if (bestMove == Coord(0,0)) {
-          println("Decided to not move")
-          println(view.toPrettyString())
-          println("situation: " + sit)
-          println(debug.toString())
+        if (bestMove == Coord(0,0) || bestValue<1000) {
+          debug("Entering ESCAPE mode")
           // prepare escape and do the 1st move
           val escapeRoute = prepareEscape(view)
           escape ++= escapeRoute
-          moveCmd( escape.dequeue() )
+          escape.dequeue()
         }
-        //println("val:" + bestValue + " move:" +bestMove)
-        lastMove = bestMove
-        moveCmd(bestMove)
+        else {
+          bestMove
+        }
 
-      case None => ""
+      case None => Coord(0,0)
     }
-    cmd
+    lastMove = move
+    debug("decision: " + move)
+    printDebug()
+
+
+    moveCmd(move)
   }
 
   def prepareEscape(view: BotView): List[Coord] = {
