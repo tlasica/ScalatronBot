@@ -2,14 +2,9 @@
  * trait for bots so that they can be mixed-in
  * Created by tomek on 13.01.15.
  */
-class Bot {
+abstract class Bot {
 
-  def react(reactCmd: ReactCmd): String = ""
-
-  def stop = ""
-
-  // coordinates in Moves are (x, y) from top left
-  def moveCmd(coord: Coord): String = "Move(direction=" + coord.col  + ":" + coord.row + ")"
+  def react(reactCmd: ReactCmd): List[BotCommand]
 
 }
 
@@ -24,20 +19,21 @@ class GoalFunDrivenBot extends Bot {
 
   var escape = new scala.collection.mutable.Queue[Coord]
 
-  override def react(reactCmd: ReactCmd): String = {
-    val cmd =
+  override def react(reactCmd: ReactCmd): List[BotCommand] = {
+    val cmd: List[BotCommand] =
     if (escape.nonEmpty) {
       val move = escape.dequeue()
       lastMove = move
-      moveCmd(move)
+      List(MoveCommand(move))
     }
     else {
-      moveForBestValue(reactCmd)
+      val move = moveForBestValue(reactCmd)
+      List(move)
     }
     cmd
   }
 
-  def moveForBestValue(reactCmd: ReactCmd): String = {
+  def moveForBestValue(reactCmd: ReactCmd): BotCommand = {
     val move = reactCmd.view match {
       case Some(view) =>
         var bestValue = GoalValue.forView( view, BotView.MasterPos )
@@ -81,8 +77,7 @@ class GoalFunDrivenBot extends Bot {
     debug("decision: " + move)
     printDebug()
 
-
-    moveCmd(move)
+    MoveCommand(move)
   }
 
   def prepareEscape(view: BotView): List[Coord] = {

@@ -9,23 +9,29 @@ class ControlFunctionFactory {
 
 class BotManager {
 
-  var master: Bot = new Bot
+  var master: Bot = _
 
   def respond(input: String) = {
     try {
       val cmd = ServerCommandParser.parse(input)
-      cmd match {
+      val response: List[BotCommand] = cmd match {
         case w: WelcomeCmd =>
           println("New round " + w.round.toString + " started")
           master = new GoalFunDrivenBot with NoDebugPrint
-          ""
+          List(new NullCommand)
         case r: ReactCmd =>
-          if (r.generation==0) master.react(r)
-          else "" // TODO: Przydupas
+          if (r.generation==0) {
+            master.react(r)
+          }
+          else {
+            // TODO: Przydupas
+            List(new NullCommand)
+          }
         case g: GoodbyeCmd =>
           println("Goodbye with energy:" + g.energy.toString)
-          master stop
+          List(new NullCommand)
       }
+      response.mkString("|")
     }
     catch {
       case e:Throwable =>

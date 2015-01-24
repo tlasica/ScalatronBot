@@ -56,6 +56,7 @@ object Distance {
     distanceMap(mRow)(mCol) = 0
     waiting.enqueue( (mRow, mCol) )
 
+    // BFS over the ground
     while( waiting.nonEmpty) {
       val next = waiting.dequeue()
       val updates = visit(next._1, next._2)
@@ -65,6 +66,17 @@ object Distance {
         waiting.enqueue((r, c))
       }
     }
+
+    // calculate distance for walls as min() wall neighbours
+    for(row <- Range(0, size))
+      for(col <- Range(0, size)) {
+        if ( ! isfree(row, col) ) {
+          val nearby = neighbours(row, col, size)
+          val d = nearby map ( (x: (Int, Int)) => distanceMap(x._1)(x._2) )
+          distanceMap(row)(col) = d min
+        }
+      }
+
     distanceMap
 
   }
