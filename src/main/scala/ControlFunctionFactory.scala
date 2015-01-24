@@ -24,8 +24,7 @@ class BotManager {
             master.react(r)
           }
           else {
-            // TODO: Przydupas
-            List(new NullCommand)
+            GuardianMiniBot.react(r)
           }
         case g: GoodbyeCmd =>
           println("Goodbye with energy:" + g.energy.toString)

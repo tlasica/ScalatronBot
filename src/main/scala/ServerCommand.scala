@@ -4,7 +4,9 @@
 
 case class Coord(row: Int, col: Int) {
 
-  def isBackOf(m: Coord): Boolean =  {
+  def opposite = Coord(-row, -col)
+
+  def isOpposite(m: Coord): Boolean =  {
     if (row == -m.row && col == -m.col) true else false
   }
 

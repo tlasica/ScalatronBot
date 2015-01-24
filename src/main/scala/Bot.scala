@@ -19,6 +19,22 @@ class GoalFunDrivenBot extends Bot {
 
   var escape = new scala.collection.mutable.Queue[Coord]
 
+  def spawnMiniIfRequired(cmd: ReactCmd, move: MoveCommand) = {
+    cmd.view match {
+      case Some(view) =>
+        val minis = view.find(BotView.Mini)
+        val energy = cmd.energy
+        val snorgs = view.find(BotView.Snorg)
+        if (energy > 100 && minis.isEmpty && snorgs.nonEmpty) {
+          val dir = move.dir.opposite
+          List( SpawnCommand(dir, 100))
+        }
+        else List()
+
+      case None => List()
+    }
+  }
+
   override def react(reactCmd: ReactCmd): List[BotCommand] = {
     val cmd: List[BotCommand] =
     if (escape.nonEmpty) {
@@ -27,13 +43,14 @@ class GoalFunDrivenBot extends Bot {
       List(MoveCommand(move))
     }
     else {
-      val move = moveForBestValue(reactCmd)
-      List(move)
+      val moves = List( moveForBestValue(reactCmd) )
+      val spawn = spawnMiniIfRequired(reactCmd, moves.head )
+      moves:::spawn
     }
     cmd
   }
 
-  def moveForBestValue(reactCmd: ReactCmd): BotCommand = {
+  def moveForBestValue(reactCmd: ReactCmd): MoveCommand = {
     val move = reactCmd.view match {
       case Some(view) =>
         var bestValue = GoalValue.forView( view, BotView.MasterPos )
@@ -46,7 +63,7 @@ class GoalFunDrivenBot extends Bot {
           val newPos:Coord = Coord(n._1, n._2)
           val move = BotView.MasterPos.findMoveTo(newPos)
           //println("considering move by " + move + " to " + newPos)
-          if (! move.isBackOf(lastMove)) {
+          if (! move.isOpposite(lastMove)) {
             val value = GoalValue.forView(view, newPos)
             debug( "move by " + move + " will lead to " + value + " and situation:")
             debug( GoalValue.situation(view, newPos.row, newPos.col).mkString("\n"))

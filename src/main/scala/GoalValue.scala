@@ -29,14 +29,8 @@ object GoalValue {
   }
 
 
-  private def groundFromView(view: BotView): Array[Array[Boolean]] = {
-    val groundLine = view.toString().toCharArray map ( (x:Char) => if (x=='W') false else true )
-    Array.tabulate(view.size, view.size)( (x,y) => groundLine(x*view.size + y) )
-  }
-
   def forView(view: BotView, pos: Coord): Long = {
-    val ground = groundFromView(view)
-    val distanceXY = Distance.calculateDistanceArray(ground, pos.row, pos.col)
+    val distanceXY = Distance.calculateDistanceArray(view, pos.row, pos.col)
     val distanceVector = distanceXY.flatten
     val viewWithDistance = view.toString().toCharArray zip distanceVector
     //println(viewWithDistance filter ((x:(Char,Int)) => (x._1 != 'W') && (x._1!='_' && (x._1!='?'))) mkString)
@@ -61,8 +55,7 @@ object GoalValue {
       else ""
     }
 
-    val ground = groundFromView(view)
-    val distance = Distance.calculateDistanceArray(ground, row, col)
+    val distance = Distance.calculateDistanceArray(view, row, col)
     val sit = for {
       r <- Range(0, 31)
       c <- Range(0, 31)

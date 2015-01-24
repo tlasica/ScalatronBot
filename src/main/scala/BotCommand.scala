@@ -16,3 +16,8 @@ case class SpawnCommand(dir: Coord, energy: Int) extends BotCommand {
 class NullCommand extends BotCommand {
   override def toString = ""
 }
+
+case class ExplodeCommand(radius: Int) extends BotCommand {
+  require(radius>=2 && radius<=10)
+  override def toString = "Explode(size=%d)".format(radius)
+}

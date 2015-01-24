@@ -81,4 +81,15 @@ object Distance {
 
   }
 
+  def calculateDistanceArray(view: BotView, mRow: Int, mCol:Int): Array[Array[Int]] = {
+    val ground = groundFromView(view)
+    calculateDistanceArray(ground, mRow, mCol)
+  }
+
+
+  private def groundFromView(view: BotView): Array[Array[Boolean]] = {
+    val groundLine = view.toString().toCharArray map ( (x:Char) => if (x==BotView.Wall) false else true )
+    Array.tabulate(view.size, view.size)( (x,y) => groundLine(x*view.size + y) )
+  }
+
 }
