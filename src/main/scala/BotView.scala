@@ -51,9 +51,6 @@ object BotView {
   val Fluppet = 'B'
   val Snorg = 'b'
 
-  val MasterPos = Coord(15,15)
-  val MiniPos = Coord(10,10)
-
   val MasterviewSize = 31
   val MiniViewSize = 21
 
@@ -70,6 +67,18 @@ object BotView {
     }
   }
 
+}
+
+object MasterPosition {
+  def row = 15
+  def col = 15
+  def coord = Coord(15, 15)
+}
+
+object MiniPosition {
+  def row = 10
+  def col = 10
+  def coord = Coord(10, 10)
 }
 
 // TODO: method at(x,y) may be replaced with apply

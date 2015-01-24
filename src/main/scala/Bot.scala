@@ -53,15 +53,15 @@ class GoalFunDrivenBot extends Bot {
   def moveForBestValue(reactCmd: ReactCmd): MoveCommand = {
     val move = reactCmd.view match {
       case Some(view) =>
-        var bestValue = GoalValue.forView( view, BotView.MasterPos )
+        var bestValue = GoalValue.forView( view, MasterPosition.coord )
         debug("current val:" + bestValue)
-        val sit = GoalValue.situation(view, 15, 15)
-        val neighbours = Distance.neighbours(15, 15, 31)
+        val sit = GoalValue.situation(view, MasterPosition.row, MasterPosition.col)
+        val neighbours = Distance.neighbours(MasterPosition.row, MasterPosition.col, 31)
         var bestMove = Coord(0, 0)
         val availableNeighbours = neighbours filter ( (x:(Int, Int)) => view.at(x._1, x._2) != BotView.Wall)
         for(n <- availableNeighbours) {
           val newPos:Coord = Coord(n._1, n._2)
-          val move = BotView.MasterPos.findMoveTo(newPos)
+          val move = MasterPosition.coord.findMoveTo(newPos)
           //println("considering move by " + move + " to " + newPos)
           if (! move.isOpposite(lastMove)) {
             val value = GoalValue.forView(view, newPos)
