@@ -16,26 +16,6 @@ class Bot {
 object Bot {
 
 }
-
-trait DebugPrint {
-  def debug(in: String)
-  def clearDebug()
-  def printDebug()
-}
-
-trait SimpleDebugPrint extends DebugPrint {
-  val d: StringBuilder = new StringBuilder
-  override def debug(in: String) { d ++= in + "\n" }
-  override def clearDebug() { d.clear() }
-  override def printDebug() { println( d.toString() ) }
-}
-
-trait NoDebugPrint extends DebugPrint {
-  override def debug(in: String) {/* noop */}
-  override def clearDebug() {/* noop */}
-  override def printDebug() {/* noop */}
-}
-
 class GoalFunDrivenBot extends Bot {
 
   this: DebugPrint =>
@@ -63,10 +43,10 @@ class GoalFunDrivenBot extends Bot {
         var bestValue = GoalValue.forView( view, BotView.MasterPos )
         debug("current val:" + bestValue)
         val sit = GoalValue.situation(view, 15, 15)
-        val nbours = Distance.neighbours(15, 15, 31)
+        val neighbours = Distance.neighbours(15, 15, 31)
         var bestMove = Coord(0, 0)
-        val availabeNBours = nbours filter ( (x:(Int, Int)) => view.at(x._1, x._2) != BotView.Wall)
-        for(n <- availabeNBours) {
+        val availableNeighbours = neighbours filter ( (x:(Int, Int)) => view.at(x._1, x._2) != BotView.Wall)
+        for(n <- availableNeighbours) {
           val newPos:Coord = Coord(n._1, n._2)
           val move = BotView.MasterPos.findMoveTo(newPos)
           //println("considering move by " + move + " to " + newPos)
@@ -84,7 +64,7 @@ class GoalFunDrivenBot extends Bot {
         debug("=======================")
         debug(sit.mkString("\n"))
         // if decided to stay and not to move we switch to escape mode
-        if (bestMove == Coord(0,0) || bestValue<1000) {
+        if (bestMove == Coord(0,0) || (bestValue>0 && bestValue<1000)) {
           debug("Entering ESCAPE mode")
           // prepare escape and do the 1st move
           val escapeRoute = prepareEscape(view)
