@@ -18,8 +18,15 @@ case class BotView(str: String) {
 
   def at(coord: Coord): Char = at(coord.row, coord.col)
 
+  private def toCoord(idx: Int) = Coord(idx / size, idx % size)
+
   def isPositionCorrect(coord: Coord): Boolean = {
     (coord.row>=0 && coord.row<size) && (coord.col>=0 && coord.col<size)
+  }
+
+  def find(what: Char): List[Coord] = {
+    val filteredWithIndex = str.zipWithIndex filter (_._1 == what)
+    filteredWithIndex map (x => toCoord(x._2)) toList
   }
 
   override def toString(): String = str

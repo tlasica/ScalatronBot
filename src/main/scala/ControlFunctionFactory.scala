@@ -20,7 +20,8 @@ class BotManager {
           master = new GoalFunDrivenBot with NoDebugPrint
           ""
         case r: ReactCmd =>
-          master.react(r)
+          if (r.generation==0) master.react(r)
+          else "" // TODO: Przydupas
         case g: GoodbyeCmd =>
           println("Goodbye with energy:" + g.energy.toString)
           master stop

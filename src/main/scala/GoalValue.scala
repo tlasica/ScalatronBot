@@ -19,10 +19,10 @@ object GoalValue {
       case BotView.Master => 0
       case BotView.EnemyMaster => -100 * distanceValue(dist)
       case BotView.EnemyMini => -300 * distanceValue(dist)
-      case BotView.Zugar => if (dist==0) 200000 else 150 * distanceValue(dist)
+      case BotView.Zugar => if (dist==0) 20000 else 150 * distanceValue(dist)
       case BotView.Toxifera => if (dist>0) 0 else -100 * distanceValue(dist)
-      case BotView.Fluppet => if (dist==0) 500000 else 200 * distanceValue(dist)
-      case BotView.Snorg => if (dist==0) -300000 else -150 * distanceValue(dist)
+      case BotView.Fluppet => if (dist==0) 50000 else 200 * distanceValue(dist)
+      case BotView.Snorg => if (dist==0) -30000 else -150 * distanceValue(dist)
       //case BotView.Empty => 1
       case _ => 0
     }
@@ -57,7 +57,7 @@ object GoalValue {
         case _ => ""
       }
       if (what.nonEmpty)
-        what + " at(" + r + "," + c + ") with dist " + dist
+        cell +"(" + r + "," + c + ")~" + dist
       else ""
     }
 
