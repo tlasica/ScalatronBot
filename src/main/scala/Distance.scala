@@ -29,41 +29,46 @@ object Distance {
     } yield(nr, nc)
   }
 
+  def calculateDistanceArray(view: BotView, center:Coord): Array[Array[Int]] = {
+    val ground = groundFromView(view)
+    calculateDistanceArray(ground, center)
+  }
+
   /**
    * Assumption: wall/not accesible == -1, free = Int.MaxValue
    * @param ground
    * @param start
    */
-  def calculateDistanceArray(ground: Array[Array[Boolean]], mRow: Int, mCol:Int): Array[Array[Int]] = {
+  def calculateDistanceArray(ground: Array[Array[Boolean]], center:Coord): Array[Array[Int]] = {
     val size = ground.length
     val distanceMap = Array.fill(size, size)(Int.MaxValue)
     def isfree(row: Int, col:Int): Boolean = ground(row)(col)
 
-    def visit(row: Int, col:Int): List[ (Int, Int, Int)] = {
-      val dist = distanceMap(row)(col)
+    def visit(pos: Coord): List[ (Coord, Int)] = {
+      val dist = distanceMap(pos.row)(pos.col)
       val updates = for{
-        (nRow,nCol) <- neighbours(row, col, size)
+        (nRow,nCol) <- neighbours(pos.row, pos.col, size)
         if isfree(nRow, nCol)
         if dist+1 < distanceMap(nRow)(nCol)
-      } yield (nRow, nCol, dist+1)
+      } yield (Coord(nRow, nCol), dist+1)
       updates
     }
 
     import scala.collection.mutable.Queue
-    val waiting = new Queue[(Int, Int)]()
+    val waiting = new Queue[Coord]()
 
     // push start point to start visiting nodes
-    distanceMap(mRow)(mCol) = 0
-    waiting.enqueue( (mRow, mCol) )
+    distanceMap(center.row)(center.col) = 0
+    waiting.enqueue( center )
 
     // BFS over the ground
     while( waiting.nonEmpty) {
       val next = waiting.dequeue()
-      val updates = visit(next._1, next._2)
+      val updates = visit(next)
       for(u <- updates) {
-        val (r, c, d) = u
-        distanceMap(r)(c) = d
-        waiting.enqueue((r, c))
+        val (coord, d) = u
+        distanceMap(coord.row)(coord.col) = d
+        waiting.enqueue(coord)
       }
     }
 
@@ -79,11 +84,6 @@ object Distance {
 
     distanceMap
 
-  }
-
-  def calculateDistanceArray(view: BotView, mRow: Int, mCol:Int): Array[Array[Int]] = {
-    val ground = groundFromView(view)
-    calculateDistanceArray(ground, mRow, mCol)
   }
 
 

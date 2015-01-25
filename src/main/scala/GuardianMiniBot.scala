@@ -9,7 +9,7 @@ object GuardianMiniBot {
       val view = reactCmd.view.get
       val snorgs: List[Coord] = view.find(BotView.Snorg)
       if (snorgs.nonEmpty) {
-        val distanceMap = Distance.calculateDistanceArray(view, MiniPosition.row, MiniPosition.col)
+        val distanceMap = Distance.calculateDistanceArray(view, MiniPosition.coord)
         val snorgsDistances = snorgs.map( (x: Coord) => distanceMap(x.row)(x.col))
         val minDist = snorgsDistances min
         val maxDist = snorgsDistances max

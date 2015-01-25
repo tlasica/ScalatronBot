@@ -30,32 +30,26 @@ object GoalValue {
 
 
   def forView(view: BotView, pos: Coord): Long = {
-    val distanceXY = Distance.calculateDistanceArray(view, pos.row, pos.col)
+    val distanceXY = Distance.calculateDistanceArray(view, pos)
     val distanceVector = distanceXY.flatten
     val viewWithDistance = view.toString().toCharArray zip distanceVector
-    //println(viewWithDistance filter ((x:(Char,Int)) => (x._1 != 'W') && (x._1!='_' && (x._1!='?'))) mkString)
     val productVector = viewWithDistance map ( (x:(Char,Int)) => cellValue(x._1, x._2) )
-    //println(productVector.filter(_!=0).mkString(", "))
     productVector.sum
   }
 
   def situation(view: BotView, row: Int, col: Int): List[String] = {
     def observationString(r: Int, c:Int, cell: Char, dist: Int): String = {
-      val what = cell match {
-        case 'm' => "Enemy Master(m)"
-        case 's' => "Enemy Mini(s)"
-        case 'P' => "Zugar(P)"
-        case 'p' => "Toxifera(p)"
-        case 'B' => "Fluppet(B)"
-        case 'b' => "Snorg(b)"
-        case _ => ""
+      val important = cell match {
+        case BotView.Empty => false
+        case BotView.Wall => false
+        case '?' => false
+        case _ => true
       }
-      if (what.nonEmpty)
-        cell +"(" + r + "," + c + ")~" + dist
+      if (important) cell +"(" + r + "," + c + ")~" + dist
       else ""
     }
 
-    val distance = Distance.calculateDistanceArray(view, row, col)
+    val distance = Distance.calculateDistanceArray(view, Coord(row, col))
     val sit = for {
       r <- Range(0, 31)
       c <- Range(0, 31)

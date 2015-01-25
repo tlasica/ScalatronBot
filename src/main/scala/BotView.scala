@@ -1,7 +1,8 @@
-/**
- * Created by tomek on 13.01.15.
- */
+case class ViewFact(what: Char, coord: Coord, distance: Int)
+
 case class BotView(str: String) {
+
+  //TODO: eliminate one of the at() methods and use Coords in all functions
 
   // Master Bot view is 31x31, mini-bot view is 21x21
   require(str.length==BotView.MasterViewNumCells || str.length==BotView.MiniViewNumCells)
@@ -18,8 +19,6 @@ case class BotView(str: String) {
 
   def at(coord: Coord): Char = at(coord.row, coord.col)
 
-  private def toCoord(idx: Int) = Coord(idx / size, idx % size)
-
   def isPositionCorrect(coord: Coord): Boolean = {
     (coord.row>=0 && coord.row<size) && (coord.col>=0 && coord.col<size)
   }
@@ -29,14 +28,35 @@ case class BotView(str: String) {
     filteredWithIndex map (x => toCoord(x._2)) toList
   }
 
+  def factsWithDistance(from: Coord): List[ViewFact] = {
+    val distanceMap = Distance.calculateDistanceArray(this, from)
+    val interestingWithIndex = str.zipWithIndex filter ( (x:(Char,Int)) => BotView.isInteresting(x._1))
+    val res = for{
+      (what, idx) <- interestingWithIndex
+      coord = toCoord(idx)
+      dist = distanceMap(coord.row)(coord.col)
+    } yield ViewFact(what, coord, dist)
+    res toList
+  }
+
   override def toString(): String = str
 
-  def toPrettyString(): String = {
-    val withIndex = str.zipWithIndex
+  private def toCoord(idx: Int) = Coord(idx / size, idx % size)
+}
+
+
+object BotViewPrinter {
+
+  def square(viewStr: String): String = {
+    val size = if (viewStr.length == 31*31) 31 else 21
+    val withIndex = viewStr.zipWithIndex
     val rows = withIndex map ( ci => if ((ci._2+1) % size == 0) ci._1 + "\n" else ci._1 )
     rows.mkString
   }
+
 }
+
+
 
 object BotView {
   val Hidden = '?'
@@ -56,6 +76,13 @@ object BotView {
 
   val MasterViewNumCells = MasterviewSize * MasterviewSize
   val MiniViewNumCells = MiniViewSize * MiniViewSize
+
+  def isInteresting(what: Char): Boolean = what match {
+    case Hidden => false
+    case Empty => false
+    case Wall => false
+    case _ => true
+  }
 
   def isSafe(cell: Char): Boolean = {
     cell match {
