@@ -21,3 +21,7 @@ case class ExplodeCommand(radius: Int) extends BotCommand {
   require(radius>=2 && radius<=10)
   override def toString = "Explode(size=%d)".format(radius)
 }
+
+case class StatusCommand(text: String) extends BotCommand {
+  override def toString = "Status(text=%s)".format(text)
+}

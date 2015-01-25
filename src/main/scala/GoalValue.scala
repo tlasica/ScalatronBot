@@ -4,8 +4,11 @@
 object GoalValue {
 
   // 0..100
-  private def distanceValue(d: Int): Long = {
-    scala.math.round(100.0 * ((31-d)*(31-d) / (31.0*31.0) ) )
+  def distanceValue(d: Int): Long = {
+    val Exp = 5.0
+    val max = math.pow(31.0, Exp)
+    val act = math.pow(31.0 - d, Exp)
+    math.round( 1000.0 * act / max )
   }
 
 
@@ -14,15 +17,15 @@ object GoalValue {
     cell match {
       case BotView.Wall =>
         if (dist == 0) -1000
-        if (dist < 4) -33
+        if (dist == 1) -1
         else 0
       case BotView.Master => 0
       case BotView.EnemyMaster => -100 * distanceValue(dist)
       case BotView.EnemyMini => -300 * distanceValue(dist)
-      case BotView.Zugar => if (dist==0) 20000 else 150 * distanceValue(dist)
+      case BotView.Zugar => if (dist==0) 200000 else 150 * distanceValue(dist)
       case BotView.Toxifera => if (dist>0) 0 else -50000
-      case BotView.Fluppet => if (dist==0) 50000 else 200 * distanceValue(dist)
-      case BotView.Snorg => if (dist==0) -30000 else -122 * distanceValue(dist)
+      case BotView.Fluppet => if (dist==0) 500000 else 200 * distanceValue(dist)
+      case BotView.Snorg => if (dist==0) -300000 else -250 * distanceValue(dist)
       case BotView.Empty => 1
       case _ => 0
     }
@@ -39,13 +42,7 @@ object GoalValue {
 
   def situation(view: BotView, row: Int, col: Int): List[String] = {
     def observationString(r: Int, c:Int, cell: Char, dist: Int): String = {
-      val important = cell match {
-        case BotView.Empty => false
-        case BotView.Wall => false
-        case '?' => false
-        case _ => true
-      }
-      if (important) cell +"(" + r + "," + c + ")~" + dist
+      if (BotView.isInteresting(cell)) "%s(%d,%d)~%d".format(cell,r,c,dist)
       else ""
     }
 

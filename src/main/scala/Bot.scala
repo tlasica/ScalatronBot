@@ -19,13 +19,13 @@ class GoalFunDrivenBot extends Bot {
 
   var escape = new scala.collection.mutable.Queue[Coord]
 
-  //TODO: spawn only if there are close snorgs
-  def spawnMiniIfRequired(cmd: ReactCmd, move: MoveCommand) = {
+  def spawnGuardianIfsnorgsApproaching(cmd: ReactCmd, move: MoveCommand) = {
     cmd.view match {
       case Some(view) =>
-        val minis = view.find(BotView.Mini)
-        val snorgs = view.find(BotView.Snorg)
-        if (snorgs.size>=3 && minis.isEmpty) {
+        val facts = view.factsWithDistance(MasterPosition.coord)
+        val snorgs = facts filter ( (f:ViewFact) => f.what == BotView.Snorg && f.distance<=5 )
+        val minis = facts filter ( (f:ViewFact) => f.what == BotView.Snorg && f.distance<10 )
+        if (minis.isEmpty && snorgs.size>=3) {
           val dir = move.dir.opposite
           List( SpawnCommand(dir, 133))
         }
@@ -40,12 +40,12 @@ class GoalFunDrivenBot extends Bot {
     if (escape.nonEmpty) {
       val move = escape.dequeue()
       lastMove = move
-      List(MoveCommand(move))
+      List(MoveCommand(move), StatusCommand("escape!"))
     }
     else {
       val moves = List( moveForBestValue(reactCmd) )
-      val spawn = spawnMiniIfRequired(reactCmd, moves.head )
-      moves:::spawn
+      val spawn = spawnGuardianIfsnorgsApproaching(reactCmd, moves.head )
+      StatusCommand("")::(moves:::spawn)
     }
     cmd
   }
@@ -77,7 +77,7 @@ class GoalFunDrivenBot extends Bot {
         debug("=======================")
         debug(sit.mkString("\n"))
         // if decided to stay and not to move we switch to escape mode
-        if (bestMove == Coord(0,0) || (bestValue>0 && bestValue<1000)) {
+        if (bestMove == Coord(0,0) /*|| (bestValue>0 && bestValue<1000) */) {
           debug("Entering ESCAPE mode")
           // prepare escape and do the 1st move
           val escapeRoute = prepareEscape(view)
@@ -114,7 +114,7 @@ class GoalFunDrivenBot extends Bot {
     val maxVis = (visibilities map ((x:(Int, Coord)) => x._1)).max
     val bestDir = (visibilities filter ((x:(Int, Coord)) => x._1 == maxVis)).head
 
-    List.fill(bestDir._1 max 6)(bestDir._2)
+    List.fill(bestDir._1 max 3)(bestDir._2)
   }
 
 }

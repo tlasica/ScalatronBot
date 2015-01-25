@@ -59,5 +59,14 @@ class DistanceSpec extends WordSpec with Matchers {
 
   }
 
+  "DistanceValue" should {
+    "grow from 0..1000" in {
+      val d0 = GoalValue.distanceValue(0)
+      val d30 = GoalValue.distanceValue(30)
+      d0 shouldBe 1000
+      d30 shouldBe 0
+      for(i <- Range(0, 30)) println( GoalValue.distanceValue(i) )
+    }
+  }
 
 }
