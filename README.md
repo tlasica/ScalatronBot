@@ -1,6 +1,5 @@
 # ScalatronBot
-Bot for the Scalatron game. It's decisions are based on a simple value+distance function.
-It is written in ''Scala'' as expected.
+Bot for the [Scalatron game](http://scalatron.github.io/).
 
 # Master Bot
 
