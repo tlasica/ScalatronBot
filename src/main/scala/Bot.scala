@@ -19,15 +19,15 @@ class GoalFunDrivenBot extends Bot {
 
   var escape = new scala.collection.mutable.Queue[Coord]
 
+  //TODO: spawn only if there are close snorgs
   def spawnMiniIfRequired(cmd: ReactCmd, move: MoveCommand) = {
     cmd.view match {
       case Some(view) =>
         val minis = view.find(BotView.Mini)
-        val energy = cmd.energy
         val snorgs = view.find(BotView.Snorg)
-        if (energy > 100 && minis.isEmpty && snorgs.nonEmpty) {
+        if (snorgs.size>=3 && minis.isEmpty) {
           val dir = move.dir.opposite
-          List( SpawnCommand(dir, 100))
+          List( SpawnCommand(dir, 133))
         }
         else List()
 

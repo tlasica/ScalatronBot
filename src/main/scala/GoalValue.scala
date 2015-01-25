@@ -12,18 +12,18 @@ object GoalValue {
   //  map ((x:Int) => BotView.MasterviewSize-x)
   private def cellValue(cell: Char, dist: Int) : Long = {
     cell match {
-//      case BotView.Wall =>
-//        if (dist == 0) -1000
-//        if (dist < 4) -33
-//        else 0
+      case BotView.Wall =>
+        if (dist == 0) -1000
+        if (dist < 4) -33
+        else 0
       case BotView.Master => 0
       case BotView.EnemyMaster => -100 * distanceValue(dist)
       case BotView.EnemyMini => -300 * distanceValue(dist)
       case BotView.Zugar => if (dist==0) 20000 else 150 * distanceValue(dist)
-      case BotView.Toxifera => if (dist>0) 0 else -100 * distanceValue(dist)
+      case BotView.Toxifera => if (dist>0) 0 else -50000
       case BotView.Fluppet => if (dist==0) 50000 else 200 * distanceValue(dist)
-      case BotView.Snorg => if (dist==0) -30000 else -150 * distanceValue(dist)
-      //case BotView.Empty => 1
+      case BotView.Snorg => if (dist==0) -30000 else -122 * distanceValue(dist)
+      case BotView.Empty => 1
       case _ => 0
     }
   }
