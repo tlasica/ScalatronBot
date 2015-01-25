@@ -15,6 +15,15 @@ MasterBot follows simple algorithm:
 4. if move is not 'stay' (so it is possible to improve) move else go ESCAPE mode
 5. if Snorgs are approaching spawn an explosive MiniBot
 
+# How to run
+
+Assumed way of working with this project is to:
++ import into IDE
++ sbt ~package so that all changes are continuously build into JAR file
++ in the Scalatron/bots create a directory with the name of your bot (can be any) and link there target JAR as ScalatronBot.jar
+
+Now if you change the code SBT will try to build JAR file and after reloading Scalatrong engine (with R key) all changes will be reflected in your Bot behaviour.
+
 # Code Structure
 
 _BotCommand.scala_
