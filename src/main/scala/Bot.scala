@@ -51,53 +51,50 @@ class GoalFunDrivenBot extends Bot {
   }
 
   def moveForBestValue(reactCmd: ReactCmd): MoveCommand = {
-    val move = reactCmd.view match {
-      case Some(view) =>
-        var bestValue = GoalValue.forView( view, MasterPosition.coord )
-        debug("current val:" + bestValue)
-        val sit = GoalValue.situation(view, MasterPosition.row, MasterPosition.col)
-        val neighbours = Distance.neighbours(MasterPosition.row, MasterPosition.col, 31)
-        var bestMove = Coord(0, 0)
-        val availableNeighbours = neighbours filter ( (x:(Int, Int)) => view.at(x._1, x._2) != BotView.Wall)
-        for(n <- availableNeighbours) {
-          val newPos:Coord = Coord(n._1, n._2)
-          val move = MasterPosition.coord.findMoveTo(newPos)
-          //println("considering move by " + move + " to " + newPos)
-          if (! move.isOpposite(lastMove)) {
-            val value = GoalValue.forView(view, newPos)
-            debug( "move by " + move + " will lead to " + value + " and situation:")
-            debug( GoalValue.situation(view, newPos.row, newPos.col).mkString("\n"))
-            if (value >= bestValue) {
-              bestMove = move
-              bestValue = value
-            }
+    println( statusString(reactCmd) )
+    if (reactCmd.view.isDefined) {
+      val view = reactCmd.view.get
+      var bestValue = GoalValue.forView( view, MasterPosition.coord )
+      debug("Current val:" + bestValue)
+      val neighbours = Distance.neighbours(MasterPosition.row, MasterPosition.col, 31)
+      var bestMove = Coord(0, 0)  // do not move at all
+      val availableNeighbours = neighbours filter ( (x:(Int, Int)) => view.at(x._1, x._2) != BotView.Wall)
+      for(n <- availableNeighbours) {
+        val newPos:Coord = Coord(n._1, n._2)
+        val move = MasterPosition.coord.findMoveTo(newPos)
+        if (! move.isOpposite(lastMove)) {
+          val value = GoalValue.forView(view, newPos)
+          debug( "move by " + move + " will lead to " + value + " and situation:")
+          debug( GoalValue.situation(view, newPos.row, newPos.col).mkString("\n"))
+          if (value >= bestValue) {
+            bestMove = move
+            bestValue = value
           }
         }
-        // print debug info
-        debug("=======================")
-        debug(sit.mkString("\n"))
-        // if decided to stay and not to move we switch to escape mode
-        if (bestMove == Coord(0,0) /*|| (bestValue>0 && bestValue<1000) */) {
-          debug("Entering ESCAPE mode")
-          // prepare escape and do the 1st move
-          val escapeRoute = prepareEscape(view)
-          escape ++= escapeRoute
-          escape.dequeue()
-        }
-        else {
-          bestMove
-        }
+      }
+      // checking if stucked
+      // if decided to stay and not to move we switch to escape mode
+      val noMoveFound = (bestMove == Coord(0,0))
+      val nothingInteresting = view.factsWithDistance(MasterPosition.coord).isEmpty
+      if (noMoveFound || nothingInteresting) {
+        debug("Starting ESCAPE mode..")
+        val escapeRoute = prepareEscape(view)
+        escape ++= escapeRoute
+        if (escape.nonEmpty) bestMove = escape.dequeue()
+      }
 
-      case None => Coord(0,0)
+      lastMove = bestMove
+      debug("decision: " + bestMove)
+      printDebug()
+      MoveCommand(bestMove)
     }
-    lastMove = move
-    debug("decision: " + move)
-    printDebug()
-
-    MoveCommand(move)
+    else {
+      MoveCommand(Coord(0, 0))
+    }
   }
 
-  def prepareEscape(view: BotView): List[Coord] = {
+
+  private def prepareEscape(view: BotView): List[Coord] = {
     def visibility(from: Coord, dir: Coord): Int = {
       var newPos = from.add(dir)
       var vis = 0
@@ -109,12 +106,16 @@ class GoalFunDrivenBot extends Bot {
     }
 
     val directions = Distance.directions
-    val visibilities = directions map (d => (visibility(Coord(15,15), d), d) )
+    val visibilities = directions map (d => (visibility(MasterPosition.coord, d), d) )
 
     val maxVis = (visibilities map ((x:(Int, Coord)) => x._1)).max
     val bestDir = (visibilities filter ((x:(Int, Coord)) => x._1 == maxVis)).head
 
-    List.fill(bestDir._1 max 3)(bestDir._2)
+    List.fill(bestDir._1 minr 3)(bestDir._2)
+  }
+
+  private def statusString(cmd: ReactCmd) : String = {
+    "time:%d, energy:%d".format(cmd.time, cmd.energy)
   }
 
 }
