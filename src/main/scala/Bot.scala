@@ -69,7 +69,7 @@ class GoalFunDrivenBot extends Bot {
   }
 
   def moveForBestValue(reactCmd: ReactCmd, facts: List[ViewFact]): MoveCommand = {
-    println( statusString(reactCmd) )
+    //println( statusString(reactCmd) )
 
     val view = reactCmd.view
     var bestValue = GoalValue.forView( view, MasterPosition.coord )
@@ -109,23 +109,9 @@ class GoalFunDrivenBot extends Bot {
 
 
   private def prepareEscape(view: BotView): List[Coord] = {
-    def visibility(from: Coord, dir: Coord): Int = {
-      var newPos = from.add(dir)
-      var vis = 0
-      while (view.isPositionCorrect(newPos) && BotView.isSafe(view.at(newPos)) ) {
-        vis += 1
-        newPos = newPos.add(dir)
-      }
-      vis
-    }
-
-    val directions = Distance.directions
-    val visibilities = directions map (d => (visibility(MasterPosition.coord, d), d) )
-
-    val maxVis = (visibilities map ((x:(Int, Coord)) => x._1)).max
-    val bestDir = (visibilities filter ((x:(Int, Coord)) => x._1 == maxVis)).head
-
-    List.fill(bestDir._1 min 3)(bestDir._2)
+    val maxSteps = 5
+    val (bestDir, bestVis) = Distance.mostVisibleDirection(view, MasterPosition.coord)
+    List.fill(bestVis min maxSteps)(bestDir)
   }
 
   private def statusString(cmd: ReactCmd) : String = {

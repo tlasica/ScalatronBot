@@ -36,7 +36,31 @@ case class BotView(str: String) {
       coord = toCoord(idx)
       dist = distanceMap(coord.row)(coord.col)
     } yield ViewFact(what, coord, dist)
-    res toList
+    res.toList
+  }
+
+  def walls(from: Coord): List[ViewFact] = {
+    val distanceMap = Distance.calculateDistanceArray(this, from)
+    val interestingWithIndex = str.zipWithIndex filter ( (x:(Char,Int)) => x._1==BotView.Wall)
+    val res = for{
+      (what, idx) <- interestingWithIndex
+      coord = toCoord(idx)
+      dist = distanceMap(coord.row)(coord.col)
+    } yield ViewFact(what, coord, dist)
+    res.toList
+
+  }
+
+
+  def visibility(from: Coord, dir: Coord): Int = {
+    import BotView.isSafe
+    var newPos = from.add(dir)
+    var vis = 0
+    while (isPositionCorrect(newPos) && isSafe(at(newPos)) ) {
+      vis += 1
+      newPos = newPos.add(dir)
+    }
+    vis
   }
 
   override def toString(): String = str

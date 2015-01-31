@@ -83,7 +83,18 @@ object Distance {
       }
 
     distanceMap
+  }
 
+
+  def directionsWithVisibility(view: BotView, pos: Coord) = {
+    val directions = Distance.directions
+    directions map (d => (d, view.visibility(pos, d) ) )
+  }
+
+  def mostVisibleDirection(view: BotView, pos: Coord): (Coord, Int) = {
+    val all = directionsWithVisibility(view, pos)
+    val best = all.maxBy( (x:(Coord,Int)) => x._2)
+    best
   }
 
 
