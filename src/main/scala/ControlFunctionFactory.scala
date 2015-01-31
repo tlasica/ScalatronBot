@@ -5,8 +5,6 @@ class ControlFunctionFactory {
   def create = new BotManager().respond _
 }
 
-// TODO: it may be a good choice to let master pass react to it's mini bots (manager should be eliminated)
-
 class BotManager {
 
   var master: Bot = _
@@ -24,7 +22,10 @@ class BotManager {
             master.react(r)
           }
           else {
-            GuardianMiniBot.react(r)
+            r.name match {
+              case x:String if x.startsWith("H") => HarvesterMiniBot.react(r)
+              case x:String if x.startsWith("G") => GuardianMiniBot.react(r)
+            }
           }
         case g: GoodbyeCmd =>
           println("Goodbye with energy:" + g.energy.toString)

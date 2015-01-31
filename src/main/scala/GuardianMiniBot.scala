@@ -1,22 +1,19 @@
 /**
  * Created by tomek on 25.01.15.
  */
-object GuardianMiniBot {
+object GuardianMiniBot extends Bot {
 
   def react(reactCmd: ReactCmd): List[BotCommand] = {
-    var res: List[BotCommand] = List()
-    if (reactCmd.view.isDefined) {
-      val view = reactCmd.view.get
-      val facts = view.factsWithDistance(MiniPosition.coord)
-      val snorgs = facts filter (_.what == BotView.Snorg)
-      val closeSnorgs = snorgs filter (_.distance <= 3)
+    val view = reactCmd.view
+    val facts = view.factsWithDistance(MiniPosition.coord)
+    val allSnorgs = facts filter (_.what == BotView.Snorg)
+    val nearSnorgs = allSnorgs filter (_.distance <= 3)
 
-      if (closeSnorgs.nonEmpty) {
-        val dist = snorgs map ( (x:ViewFact) => x.distance)
-        res = List(ExplodeCommand(3))
-      }
+    if (nearSnorgs.nonEmpty) {
+      val range = 3
+      List(ExplodeCommand(range))
     }
-    res
+    else List(StatusCommand(reactCmd.name))
   }
 
 }

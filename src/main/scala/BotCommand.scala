@@ -9,8 +9,8 @@ case class MoveCommand(dir: Coord) extends BotCommand {
   override def toString = "Move(direction=%d:%d)".format(dir.col, dir.row)
 }
 
-case class SpawnCommand(dir: Coord, energy: Int) extends BotCommand {
-  override def toString = "Spawn(direction=%d:%d,energy=%d)".format(dir.col, dir.row, energy)
+case class SpawnCommand(name: String, dir: Coord, energy: Int) extends BotCommand {
+  override def toString = "Spawn(name=%s,direction=%d:%d,energy=%d)".format(name, dir.col, dir.row, energy)
 }
 
 class NullCommand extends BotCommand {

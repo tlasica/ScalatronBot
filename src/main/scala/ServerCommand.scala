@@ -61,9 +61,9 @@ case class ReactCmd(params: Map[String, String]) extends ServerCommand {
     case None => None
   }
 
-  def view: Option[BotView] = params.get("view") match {
-    case Some(x: String) => Some(BotView(x))
-    case None => None
+  def view: BotView = params.get("view") match {
+    case Some(x: String) => BotView(x)
+    case None => throw new IllegalArgumentException("No view string in the React() command")
   }
 
   //TODO: view
