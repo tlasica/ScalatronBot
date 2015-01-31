@@ -12,7 +12,16 @@ MasterBot follows simple algorithm:
   + let MV = value(situation)
   + if MV is better than current best value remember MV and the move
 4. if move is not 'stay' (so it is possible to improve) move else go ESCAPE mode
-5. if Snorgs are approaching spawn an explosive MiniBot
+5. if Snorgs are approaching spawn an explosive GuardianMiniBot
+6. it there are goods (Fluppets or Zugars) spawn a HarvesterMiniBot
+
+# Harvester Mini Bot
+
+1. if energy is very high => try to return to Master, else
+2. if sth to harvest is near => go and harvest, else
+3. if snorgs are approaching => try to escape, else
+4. if energy is enough => try to return to Master, else
+5. move randomly :-)
 
 # How to run
 

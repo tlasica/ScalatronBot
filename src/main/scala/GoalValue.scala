@@ -16,7 +16,7 @@ object GoalValue {
   private def cellValue(cell: Char, dist: Int) : Long = {
     cell match {
       case BotView.Wall =>
-        if (dist == 0) -1000
+        if (dist == 0) -300
         if (dist == 1) -1
         else 0
       case BotView.Master => 0
@@ -26,7 +26,7 @@ object GoalValue {
       case BotView.Toxifera => if (dist>0) 0 else -50000
       case BotView.Fluppet => if (dist==0) 500000 else 200 * distanceValue(dist)
       case BotView.Snorg => if (dist==0) -300000 else -250 * distanceValue(dist)
-      case BotView.Empty => 1
+      case BotView.Empty => 4
       case _ => 0
     }
   }

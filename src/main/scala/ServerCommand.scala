@@ -4,6 +4,7 @@
 
 case class Coord(row: Int, col: Int) {
 
+
   def opposite = Coord(-row, -col)
 
   def isOpposite(m: Coord): Boolean =  {
@@ -14,8 +15,27 @@ case class Coord(row: Int, col: Int) {
     Coord(dest.row-this.row, dest.col-this.col)
   }
 
+  def findDirTo(dest: Coord): Coord = {
+    val move = findMoveTo(dest)
+    Coord(Math.signum(move.row).toInt, Math.signum(move.col).toInt)
+  }
+
   def add(move: Coord): Coord = {
     new Coord(row + move.row, col + move.col)
+  }
+
+  def similarDirections: List[Coord] = {
+    this match {
+      case Coord(-1,-1) => List(Coord(-1,0), Coord(0,-1))
+      case Coord(-1, 0) => List(Coord(-1,-1), Coord(0,-1))
+      case Coord(-1, 1) => List(Coord(-1, 0), Coord(0, 1))
+      case Coord(0, 1) => List(Coord(-1, 1), Coord(1, 1))
+      case Coord(1, 1) => List(Coord(0, 1), Coord(1, 0))
+      case Coord(1, 0) => List(Coord(1, -1), Coord(1, 1))
+      case Coord(1, -1) => List(Coord(0, -1), Coord(-1, 0))
+      case Coord(0, -1) => List(Coord(-1, -1), Coord(1, -1))
+      case _ => List()
+    }
   }
 }
 
@@ -43,13 +63,13 @@ case class WelcomeCmd(name: String,
 
 case class ReactCmd(params: Map[String, String]) extends ServerCommand {
 
-  def generation = params.getOrElse("generation", "0").toInt
+  def generation: Int = params.getOrElse("generation", "0").toInt
 
-  def name = params.getOrElse("name", "???")
+  def name: String = params.getOrElse("name", "???")
 
-  def time = params("time").toInt
+  def time: Int = params("time").toInt
 
-  def energy = params("energy").toInt
+  def energy: Int = params.getOrElse("energy", "0").toInt
 
   def masterPosition: Option[Coord] = params.get("master") match {
     case Some(x: String) => Some(Coord.fromString(x))

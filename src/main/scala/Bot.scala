@@ -41,10 +41,10 @@ class GoalFunDrivenBot extends Bot {
     val fluppets = facts filter ((f:ViewFact) => f.what == BotView.Fluppet)
     val zugars = facts filter ((f:ViewFact) => f.what == BotView.Zugar)
     val minis = facts filter ( (f:ViewFact) => f.what == BotView.Mini )
-    val isWorth = fluppets.size + zugars.size > 5
+    val isWorth = fluppets.size + zugars.size > 2
     if (isWorth && minis.isEmpty) {
       val dir = move.dir.opposite
-      val energy = 125
+      val energy = 100
       val name = "H%d".format(cmd.time)
       List( SpawnCommand(name, dir, energy))
     }
@@ -60,7 +60,7 @@ class GoalFunDrivenBot extends Bot {
     }
     else {
       val facts = reactCmd.view.factsWithDistance(MasterPosition.coord)
-      val moves = List( moveForBestValue(reactCmd) )
+      val moves = List( moveForBestValue(reactCmd, facts) )
       val maxMiniBots = 3
       val spawnGuards = spawnGuardianIfsnorgsApproaching(reactCmd, facts, moves.head )
       val spawnHarvesters = spawnHarvesterMiniBot(reactCmd, facts, moves.head )
@@ -68,8 +68,8 @@ class GoalFunDrivenBot extends Bot {
     }
   }
 
-  def moveForBestValue(reactCmd: ReactCmd): MoveCommand = {
-    //println( statusString(reactCmd) )
+  def moveForBestValue(reactCmd: ReactCmd, facts: List[ViewFact]): MoveCommand = {
+    println( statusString(reactCmd) )
 
     val view = reactCmd.view
     var bestValue = GoalValue.forView( view, MasterPosition.coord )
@@ -84,7 +84,7 @@ class GoalFunDrivenBot extends Bot {
         val value = GoalValue.forView(view, newPos)
         debug( "move by " + move + " will lead to " + value + " and situation:")
         debug( GoalValue.situation(view, newPos.row, newPos.col).mkString("\n"))
-        if (value >= bestValue) {
+        if (value > bestValue) {
           bestMove = move
           bestValue = value
         }
@@ -92,8 +92,8 @@ class GoalFunDrivenBot extends Bot {
     }
 
     // if decided to stay and not to move we switch to escape mode
-    val noMoveFound = (bestMove == Coord(0,0))
-    val nothingInteresting = view.factsWithDistance(MasterPosition.coord).isEmpty
+    val noMoveFound = bestMove == Coord(0,0)
+    val nothingInteresting = facts.isEmpty
     if (noMoveFound || nothingInteresting) {
       debug("Starting ESCAPE mode..")
       val escapeRoute = prepareEscape(view)
