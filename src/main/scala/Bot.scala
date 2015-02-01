@@ -41,7 +41,7 @@ class GoalFunDrivenBot extends Bot {
     val fluppets = facts filter ((f:ViewFact) => f.what == BotView.Fluppet)
     val zugars = facts filter ((f:ViewFact) => f.what == BotView.Zugar)
     val minis = facts filter ( (f:ViewFact) => f.what == BotView.Mini )
-    val isWorth = fluppets.size + zugars.size > 2
+    val isWorth = fluppets.size + zugars.size > 0
     if (isWorth && minis.isEmpty) {
       val dir = move.dir.opposite
       val energy = 100
