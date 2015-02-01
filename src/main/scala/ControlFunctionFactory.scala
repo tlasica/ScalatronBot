@@ -28,7 +28,7 @@ class BotManager {
           else {
             r.name match {
               case x:String if x.startsWith("H") =>
-                val bot = miniBots.getOrElseUpdate(x, new HarvesterMiniBot)
+                val bot = miniBots.getOrElseUpdate(x, new HarvesterMiniBot(apocalypse))
                 bot.react(r)
               case x:String if x.startsWith("G") =>
                 GuardianMiniBot.react(r)
@@ -45,14 +45,9 @@ class BotManager {
     }
     catch {
       case e:Throwable =>
-        println("Fuck! " + e.getMessage())
-        e.printStackTrace
-             // TODO: Logging
+        println("Fuck! " + e.getMessage)
+        e.printStackTrace()
     }
-  }
-
-  private def getOrCreateHarvester(name: String) = {
-    miniBots.getOrElseUpdate(name, new HarvesterMiniBot)
   }
 
 }

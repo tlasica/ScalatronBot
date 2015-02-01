@@ -3,7 +3,7 @@ import scala.collection.mutable
 /**
  * Created by tomek on 31.01.15.
  */
-class HarvesterMiniBot extends Bot {
+class HarvesterMiniBot(val apocalypse: Int) extends Bot {
 
   private def forceReturn(energy: Int) = energy > 2000
   private def worthReturn(energy: Int) = energy > 1000
@@ -24,7 +24,7 @@ class HarvesterMiniBot extends Bot {
       val moveForGoods = moveToNearestGood(reactCmd, facts)
       val moveEscapeSnorgs = escapeSnorgs(reactCmd, facts)
 
-      val returnVisibilityLimit = if (reactCmd.time>4500) 5 else 15
+      val returnVisibilityLimit = if (reactCmd.time>(apocalypse-500)) 5 else 15
       val moveReturn = returnToMaster(reactCmd, facts, returnVisibilityLimit)
       //val random = randoMove(reactCmd, facts)
       if (forceReturn(reactCmd.energy) && moveReturn.isDefined) moveReturn.get :: List( StatusCommand(status+"[fr]") )
