@@ -36,7 +36,7 @@ class BotManager {
           }
         case g: GoodbyeCmd =>
           val livingMinis = miniBots.filter( (x:(String,Bot)) => x._2.timestamp == apocalypse )
-          val minisEnergy = miniBots map ( (x:(String,Bot)) => x._2.energy ) sum
+          val minisEnergy = livingMinis map ( (x:(String,Bot)) => x._2.energy ) sum
           val msg = "Goodbye with energy %d and %d in remaining mini bots"format(g.energy, minisEnergy)
           println( msg )
           List(new NullCommand)

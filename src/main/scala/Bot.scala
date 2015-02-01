@@ -43,9 +43,9 @@ class GoalFunDrivenBot extends Bot {
   private def spawnHarvesterMiniBot(cmd: ReactCmd, facts: List[ViewFact], move: MoveCommand) = {
     val fluppets = facts filter ((f:ViewFact) => f.what == BotView.Fluppet)
     val zugars = facts filter ((f:ViewFact) => f.what == BotView.Zugar)
-    val minis = facts filter ( (f:ViewFact) => f.what == BotView.Mini )
+    val nearMinis = facts filter ( (f:ViewFact) => f.what == BotView.Mini && f.distance<8 )
     val isWorth = fluppets.size + zugars.size > 0
-    if (isWorth && minis.isEmpty) {
+    if (isWorth && nearMinis.isEmpty) {
       val dir = move.dir.opposite
       val energy = 100
       val name = "H%d".format(cmd.time)
