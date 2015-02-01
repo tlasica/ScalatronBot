@@ -93,7 +93,9 @@ object Distance {
 
   def mostVisibleDirection(view: BotView, pos: Coord): (Coord, Int) = {
     val all = directionsWithVisibility(view, pos)
-    val best = all.maxBy( (x:(Coord,Int)) => x._2)
+    val bestVis = all map ( (x:(Coord,Int)) => x._2) max
+    val bestDirs = all filter ( (x:(Coord,Int)) => x._2 == bestVis)
+    val best = util.Random.shuffle(bestDirs).head
     best
   }
 

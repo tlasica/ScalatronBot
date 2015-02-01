@@ -10,13 +10,32 @@ class HarvesterMiniBot extends Bot {
 
   private def statusString(cmd:ReactCmd) = "%s[%d]".format(cmd.name, cmd.energy)
 
-  private val escape = new mutable.Queue[Coord]()
+  private var escapeDir: Option[Coord] = None
+  private var escapeSteps: Int = 0
+
+  private def escapeMove(reactCmd: ReactCmd): Option[BotCommand] = {
+    if (escapeDir.isDefined) {
+      val dest = MiniPosition.coord add escapeDir.get
+      if ( escapeSteps>0 && reactCmd.view.at(dest) == BotView.Empty ) {
+        escapeSteps = escapeSteps - 1
+        Some(MoveCommand(escapeDir.get))
+      }
+      else {
+        escapeDir = None
+        escapeSteps = 0
+        None
+      }
+    }
+    else None
+  }
 
   override def react(reactCmd: ReactCmd): List[BotCommand] = {
     val status = statusString(reactCmd)
 
-    if (escape.nonEmpty) {
-      MoveCommand(escape.dequeue())::List(StatusCommand(status+"[e]"))
+    val escape = escapeMove(reactCmd)
+
+    if (escape.isDefined) {
+      List(escape.get, StatusCommand(status+"[e]"))
     }
     else {
       val facts = reactCmd.view.factsWithDistance(MiniPosition.coord)
@@ -29,9 +48,9 @@ class HarvesterMiniBot extends Bot {
       else if (moveEscapeSnorgs.isDefined) moveEscapeSnorgs.get :: List( StatusCommand(status+"[s]") )
       else if (moveReturn.isDefined) moveReturn.get :: List( StatusCommand(status+"[r]") )
       else {
-        escape ++= prepareEscape(reactCmd.view)
-        if (escape.nonEmpty) MoveCommand(escape.dequeue())::List(StatusCommand(status+"[e]"))
-        else List( StatusCommand(status+"[?]"))
+        escapeDir = Some(prepareEscape(reactCmd.view))
+        escapeSteps = 17
+        List()
       }
     }
   }
@@ -93,11 +112,9 @@ class HarvesterMiniBot extends Bot {
     else None
   }
 
-  private def prepareEscape(view: BotView): List[Coord] = {
-    val maxSteps = 5
+  private def prepareEscape(view: BotView): Coord = {
     val (bestDir, bestVis) = Distance.mostVisibleDirection(view, MiniPosition.coord)
-    val steps = bestVis min maxSteps
-    List.fill(steps)(bestDir)
+    bestDir
   }
 
   private def escapeFromWalls(view: BotView): Option[BotCommand] = {
