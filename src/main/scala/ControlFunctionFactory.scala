@@ -9,12 +9,14 @@ class BotManager {
 
   var master: Bot = _
   val miniBots = new scala.collection.mutable.HashMap[String, Bot]()
+  var apocalypse: Int = _
 
   def respond(input: String) = {
     try {
       val cmd = ServerCommandParser.parse(input)
       val response: List[BotCommand] = cmd match {
         case w: WelcomeCmd =>
+          apocalypse = w.apocalypse
           println("New round " + w.round.toString + " started")
           master = new GoalFunDrivenBot with NoDebugPrint
           miniBots.clear()
@@ -33,7 +35,10 @@ class BotManager {
             }
           }
         case g: GoodbyeCmd =>
-          println("Goodbye with energy:" + g.energy.toString)
+          val livingMinis = miniBots.filter( (x:(String,Bot)) => x._2.timestamp == apocalypse )
+          val minisEnergy = miniBots map ( (x:(String,Bot)) => x._2.energy ) sum
+          val msg = "Goodbye with energy %d and %d in remaining mini bots"format(g.energy, minisEnergy)
+          println( msg )
           List(new NullCommand)
       }
       response.mkString("|")

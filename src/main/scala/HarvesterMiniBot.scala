@@ -13,6 +13,7 @@ class HarvesterMiniBot extends Bot {
   private var escape = Escape(MiniPosition.coord)
 
   override def react(reactCmd: ReactCmd): List[BotCommand] = {
+    super.react(reactCmd)
     val status = statusString(reactCmd)
     val esc = escape.move(reactCmd.view)
     if (esc.isDefined) {
@@ -22,7 +23,9 @@ class HarvesterMiniBot extends Bot {
       val facts = reactCmd.view.factsWithDistance(MiniPosition.coord)
       val moveForGoods = moveToNearestGood(reactCmd, facts)
       val moveEscapeSnorgs = escapeSnorgs(reactCmd, facts)
-      val moveReturn = returnToMaster(reactCmd, facts)
+
+      val returnVisibilityLimit = if (reactCmd.time>4500) 5 else 15
+      val moveReturn = returnToMaster(reactCmd, facts, returnVisibilityLimit)
       //val random = randoMove(reactCmd, facts)
       if (forceReturn(reactCmd.energy) && moveReturn.isDefined) moveReturn.get :: List( StatusCommand(status+"[fr]") )
       if (moveForGoods.isDefined) moveForGoods.get :: List( StatusCommand(status+"[h]") )
@@ -37,7 +40,8 @@ class HarvesterMiniBot extends Bot {
     }
   }
 
-  private def returnToMaster(cmd: ReactCmd, facts: List[ViewFact]): Option[BotCommand] = {
+  //TODO: jeśli master jest widoczny należy zrobić ruch w jego kierunku
+  private def returnToMaster(cmd: ReactCmd, facts: List[ViewFact], visLimit: Int): Option[BotCommand] = {
     val master = cmd.masterPosition.get
     val masterDist = Math.round(Math.sqrt(master.row*master.row + master.col*master.col))
     if ( worthReturn(cmd.energy) ) {
@@ -47,7 +51,7 @@ class HarvesterMiniBot extends Bot {
       val visibleDirs = for {
         dir <- available
         v = cmd.view.visibility(MiniPosition.coord, dir)
-        if v > masterDist / 2.0
+        if v >= visLimit //masterDist / 2.0
       } yield dir
       if (visibleDirs.nonEmpty) Some(MoveCommand(visibleDirs.head)) else None
     }

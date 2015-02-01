@@ -3,7 +3,8 @@
  */
 object GuardianMiniBot extends Bot {
 
-  def react(reactCmd: ReactCmd): List[BotCommand] = {
+  override def react(reactCmd: ReactCmd): List[BotCommand] = {
+    super.react(reactCmd)
     val view = reactCmd.view
     val facts = view.factsWithDistance(MiniPosition.coord)
     val allSnorgs = facts filter (_.what == BotView.Snorg)

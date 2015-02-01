@@ -4,13 +4,17 @@
  */
 abstract class Bot {
 
-  def react(reactCmd: ReactCmd): List[BotCommand]
+  def react(reactCmd: ReactCmd): List[BotCommand] = {
+    energy = reactCmd.energy
+    timestamp = reactCmd.time
+    List()
+  }
 
+  var energy: Int = 0
+  var timestamp: Int = 0
 }
 
-object Bot {
 
-}
 class GoalFunDrivenBot extends Bot {
 
   this: DebugPrint =>
@@ -36,7 +40,6 @@ class GoalFunDrivenBot extends Bot {
     else List()
   }
 
-  //TODO: list of facts can be probably an input to this function
   private def spawnHarvesterMiniBot(cmd: ReactCmd, facts: List[ViewFact], move: MoveCommand) = {
     val fluppets = facts filter ((f:ViewFact) => f.what == BotView.Fluppet)
     val zugars = facts filter ((f:ViewFact) => f.what == BotView.Zugar)
