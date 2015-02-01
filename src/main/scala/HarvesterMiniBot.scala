@@ -10,32 +10,13 @@ class HarvesterMiniBot extends Bot {
 
   private def statusString(cmd:ReactCmd) = "%s[%d]".format(cmd.name, cmd.energy)
 
-  private var escapeDir: Option[Coord] = None
-  private var escapeSteps: Int = 0
-
-  private def escapeMove(reactCmd: ReactCmd): Option[BotCommand] = {
-    if (escapeDir.isDefined) {
-      val dest = MiniPosition.coord add escapeDir.get
-      if ( escapeSteps>0 && reactCmd.view.at(dest) == BotView.Empty ) {
-        escapeSteps = escapeSteps - 1
-        Some(MoveCommand(escapeDir.get))
-      }
-      else {
-        escapeDir = None
-        escapeSteps = 0
-        None
-      }
-    }
-    else None
-  }
+  private var escape = Escape(MiniPosition.coord)
 
   override def react(reactCmd: ReactCmd): List[BotCommand] = {
     val status = statusString(reactCmd)
-
-    val escape = escapeMove(reactCmd)
-
-    if (escape.isDefined) {
-      List(escape.get, StatusCommand(status+"[e]"))
+    val esc = escape.move(reactCmd.view)
+    if (esc.isDefined) {
+      List(esc.get, StatusCommand(status+"[e]"))
     }
     else {
       val facts = reactCmd.view.factsWithDistance(MiniPosition.coord)
@@ -48,8 +29,9 @@ class HarvesterMiniBot extends Bot {
       else if (moveEscapeSnorgs.isDefined) moveEscapeSnorgs.get :: List( StatusCommand(status+"[s]") )
       else if (moveReturn.isDefined) moveReturn.get :: List( StatusCommand(status+"[r]") )
       else {
-        escapeDir = Some(prepareEscape(reactCmd.view))
-        escapeSteps = 17
+        val escapeDir = prepareEscape(reactCmd.view)
+        val escapeSteps = 17
+        escape.start(escapeDir, escapeSteps)
         List()
       }
     }

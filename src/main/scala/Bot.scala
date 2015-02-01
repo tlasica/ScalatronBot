@@ -17,7 +17,7 @@ class GoalFunDrivenBot extends Bot {
 
   var lastMove: Coord = Coord(0,0)
 
-  var escape = new scala.collection.mutable.Queue[Coord]
+  private var escape = Escape(MasterPosition.coord)
 
   /**
    * If there are many near snorgs visible and no mini is already visible then
@@ -53,19 +53,18 @@ class GoalFunDrivenBot extends Bot {
 
 
   override def react(reactCmd: ReactCmd): List[BotCommand] = {
-    if (escape.nonEmpty) {
-      val move = escape.dequeue()
-      lastMove = move
-      List(MoveCommand(move), StatusCommand("escape!"))
+    val facts = reactCmd.view.factsWithDistance(MasterPosition.coord)
+    val esc = escape.move(reactCmd.view)
+    val move =
+    if (esc.isDefined) {
+      esc.get
     }
     else {
-      val facts = reactCmd.view.factsWithDistance(MasterPosition.coord)
-      val moves = List( moveForBestValue(reactCmd, facts) )
-      val maxMiniBots = 3
-      val spawnGuards = spawnGuardianIfsnorgsApproaching(reactCmd, facts, moves.head )
-      val spawnHarvesters = spawnHarvesterMiniBot(reactCmd, facts, moves.head )
-      StatusCommand("")::moves:::spawnGuards:::spawnHarvesters
+      moveForBestValue(reactCmd, facts)
     }
+    val spawnGuards = spawnGuardianIfsnorgsApproaching(reactCmd, facts, move )
+    val spawnHarvesters = spawnHarvesterMiniBot(reactCmd, facts, move )
+    move::spawnGuards:::spawnHarvesters
   }
 
   def moveForBestValue(reactCmd: ReactCmd, facts: List[ViewFact]): MoveCommand = {
@@ -95,10 +94,10 @@ class GoalFunDrivenBot extends Bot {
     val noMoveFound = bestMove == Coord(0,0)
     val nothingInteresting = facts.isEmpty
     if (noMoveFound || nothingInteresting) {
-      debug("Starting ESCAPE mode..")
-      val escapeRoute = prepareEscape(view)
-      escape ++= escapeRoute
-      if (escape.nonEmpty) bestMove = escape.dequeue()
+      val escapeDir = prepareEscape(reactCmd.view)
+      val escapeSteps = 17
+      escape.start(escapeDir, escapeSteps)
+      bestMove = Coord(0,0)
     }
 
     lastMove = bestMove
@@ -107,11 +106,9 @@ class GoalFunDrivenBot extends Bot {
     MoveCommand(bestMove)
   }
 
-
-  private def prepareEscape(view: BotView): List[Coord] = {
-    val maxSteps = 5
+  private def prepareEscape(view: BotView): Coord = {
     val (bestDir, bestVis) = Distance.mostVisibleDirection(view, MasterPosition.coord)
-    List.fill(bestVis min maxSteps)(bestDir)
+    bestDir
   }
 
   private def statusString(cmd: ReactCmd) : String = {
