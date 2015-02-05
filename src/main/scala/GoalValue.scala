@@ -9,28 +9,34 @@ object GoalValue {
   }
 
 
-  //  map ((x:Int) => BotView.MasterviewSize-x)
   private def cellValue(cell: Char, dist: Int) : Long = {
-    def wallValue: Int = {
-      if (dist == 0) -300
-      else if (dist == -1) -1
-      else 0
-    }
-
     cell match {
-      case BotView.Wall => wallValue
+      case BotView.Wall => wallValue(dist)
       case BotView.Master => 0
       case BotView.EnemyMaster => -100 * distanceValue(dist)
       case BotView.EnemyMini => -300 * distanceValue(dist)
       case BotView.Zugar => if (dist==0) 200000 else 150 * distanceValue(dist)
       case BotView.Toxifera => if (dist>0) 0 else -50000
-      case BotView.Fluppet => if (dist==0) 500000 else 200 * distanceValue(dist)
-      case BotView.Snorg => if (dist==0) -300000 else -250 * distanceValue(dist)
+      case BotView.Fluppet => fluppetValue(dist)
+      case BotView.Snorg => snorgValue(dist)
       case BotView.Empty => 4
       case _ => 0
     }
   }
 
+  private def wallValue(dist: Int): Long = {
+    if (dist == 0) -300
+    else if (dist == -1) -1
+    else 0
+  }
+
+  private def snorgValue(dist: Int): Long = {
+    if (dist==0) -300000L else -250 * distanceValue(dist)
+  }
+
+  private def fluppetValue(dist: Int): Long = {
+    if (dist==0) 500000L else 200 * distanceValue(dist)
+  }
 
   def forView(view: BotView, pos: Coord): Long = {
     val distanceXY = Distance.calculateDistanceArray(view, pos)

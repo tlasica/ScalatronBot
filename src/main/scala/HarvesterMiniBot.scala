@@ -17,23 +17,22 @@ class HarvesterMiniBot(val apocalypse: Int) extends Bot {
     val status = statusString(reactCmd)
     val esc = escape.move(reactCmd.view)
     if (esc.isDefined) {
-      List(esc.get, StatusCommand(status+"[e]"))
+      List(esc.get, StatusCommand(status + "[e]"))
     }
     else {
       val facts = reactCmd.view.factsWithDistance(MiniPosition.coord)
       val moveForGoods = moveToNearestGood(reactCmd, facts)
       val moveEscapeSnorgs = escapeSnorgs(reactCmd, facts)
 
-      val returnVisibilityLimit = if (reactCmd.time>(apocalypse-500)) 5 else 15
+      val returnVisibilityLimit = if (reactCmd.time>(apocalypse - 500)) 5 else 15
       val moveReturn = returnToMaster(reactCmd, facts, returnVisibilityLimit)
-      //val random = randoMove(reactCmd, facts)
-      if (forceReturn(reactCmd.energy) && moveReturn.isDefined) moveReturn.get :: List( StatusCommand(status+"[fr]") )
+      if (forceReturn(reactCmd.energy) && moveReturn.isDefined) moveReturn.get :: List( StatusCommand(status + "[fr]") )
       if (moveForGoods.isDefined) {
-        moveForGoods.get :: List( StatusCommand(status+"[h]") ) }
+        moveForGoods.get :: List( StatusCommand(status + "[h]") ) }
       else if (moveEscapeSnorgs.isDefined) {
-        moveEscapeSnorgs.get :: List( StatusCommand(status+"[s]") ) }
+        moveEscapeSnorgs.get :: List( StatusCommand(status + "[s]") ) }
       else if (moveReturn.isDefined) {
-        moveReturn.get :: List( StatusCommand(status+"[r]") )
+        moveReturn.get :: List( StatusCommand(status + "[r]") )
       }
       else {
         val escapeDir = prepareEscape(reactCmd.view)
@@ -46,9 +45,8 @@ class HarvesterMiniBot(val apocalypse: Int) extends Bot {
 
   private def returnToMaster(cmd: ReactCmd, facts: List[ViewFact], visLimit: Int): Option[BotCommand] = {
     val master = cmd.masterPosition.get
-    val masterDist = Math.round(Math.sqrt(master.row*master.row + master.col*master.col))
     if ( worthReturn(cmd.energy) ) {
-      val move = Coord(Math.signum(master.col).toInt, Math.signum(master.row).toInt)
+      val move = Coord(math.signum(master.col).toInt, math.signum(master.row).toInt)
       val similar = move.similarDirections
       val available = (move :: similar) filter ( (x:Coord) => BotView.isSafe( cmd.view.at( MiniPosition.coord.add(x) ) ) )
       val visibleDirs = for {
@@ -117,7 +115,7 @@ class HarvesterMiniBot(val apocalypse: Int) extends Bot {
       dir <- Distance.directions
       dest = MiniPosition.coord.add(dir)
       if BotView.isSafe(view.at(dest))
-      wallsWeight = view.walls(dest) map ((x:ViewFact) => Math.round(100.0*(21.0-x.distance)/21.0)) sum
+      wallsWeight = view.walls(dest) map ((x:ViewFact) => math.round(100.0*(21.0-x.distance)/21.0)) sum
     } yield (dir, wallsWeight)
     if (options.nonEmpty) {
       println("escape from walls options: " + options.mkString(";"))

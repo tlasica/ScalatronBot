@@ -17,7 +17,7 @@ case class Coord(row: Int, col: Int) {
 
   def findDirTo(dest: Coord): Coord = {
     val move = findMoveTo(dest)
-    Coord(Math.signum(move.row).toInt, Math.signum(move.col).toInt)
+    Coord(math.signum(move.row).toInt, math.signum(move.col).toInt)
   }
 
   def add(move: Coord): Coord = {

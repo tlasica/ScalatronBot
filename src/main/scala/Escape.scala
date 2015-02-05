@@ -17,18 +17,21 @@ case class Escape(pos: Coord) {
   }
 
   def move(view: BotView): Option[MoveCommand] = {
+    var res: Option[MoveCommand] = None
     if (escapeDir.isDefined) {
       val dest = pos add escapeDir.get
       if ( escapeSteps>0 && view.at(dest) == BotView.Empty ) {
-        escapeSteps = escapeSteps - 1
-        Some(MoveCommand(escapeDir.get))
+        res = nextMove
       }
-      else {
-        stop()
-        None
-      }
+      else stop()
     }
-    else None
+    res
+  }
+
+  private def nextMove: Option[MoveCommand] = {
+    require(escapeSteps > 0 && escapeDir.isDefined)
+    escapeSteps = escapeSteps - 1
+    Some(MoveCommand(escapeDir.get))
   }
 
 }

@@ -71,9 +71,7 @@ class GoalFunDrivenBot extends Bot {
   }
 
   def moveForBestValue(reactCmd: ReactCmd, facts: List[ViewFact]): MoveCommand = {
-    //println( statusString(reactCmd) )
-
-    val view = reactCmd.view
+      val view = reactCmd.view
     var bestValue = GoalValue.forView( view, MasterPosition.coord )
     debug("Current val:" + bestValue)
     val neighbours = Distance.neighbours(MasterPosition.row, MasterPosition.col, 31)

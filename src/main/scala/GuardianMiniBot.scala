@@ -14,7 +14,9 @@ object GuardianMiniBot extends Bot {
       val range = 3
       List(ExplodeCommand(range))
     }
-    else List(StatusCommand(reactCmd.name))
+    else {
+      List(StatusCommand(reactCmd.name))
+    }
   }
 
 }
