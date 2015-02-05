@@ -67,7 +67,7 @@ object Distance {
         if ( ! isfree(row, col) ) {
           val nearby = neighbours(row, col, size)
           val d = nearby map ( (x: (Int, Int)) => distanceMap(x._1)(x._2) )
-          distanceMap(row)(col) = d min
+          distanceMap(row)(col) = 1 + d.min
         }
       }
 

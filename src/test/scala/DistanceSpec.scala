@@ -34,8 +34,8 @@ class DistanceSpec extends WordSpec with Matchers {
       val dist = Distance.calculateDistanceArray(ground, Coord(0, 0))
       dist(0)(1) shouldBe 1
       dist(1)(0) shouldBe 1
-      dist(1)(1) shouldBe Int.MaxValue
-      dist(0)(2) shouldBe Int.MaxValue
+      dist(1)(1) shouldBe 1
+      dist(0)(2) shouldBe 2
       dist(0)(3) shouldBe 6
       dist(3)(1) shouldBe 3
     }
