@@ -1,15 +1,4 @@
-/**
- * Created by tomek on 15.01.15.
- * Baaaardzo nie funkcyjne
- */
-
 object Distance {
-
-  /* Dlaczego to się nie chce skompilować??
-  def xyFromLineArray[T](in: Array[T], rowSize: Int): Array[Array[T]] = {
-    Array.tabulate(rowSize, rowSize)[T]( (x,y) => in(x*rowSize + y) )
-  }
-  */
 
   def directions: List[Coord] = {
     for{
@@ -44,13 +33,13 @@ object Distance {
     val distanceMap = Array.fill(size, size)(Int.MaxValue)
     def isfree(row: Int, col:Int): Boolean = ground(row)(col)
 
-    def visit(pos: Coord): List[ (Coord, Int)] = {
+    def visit(pos: Coord): List[(Coord, Int)] = {
       val dist = distanceMap(pos.row)(pos.col)
       val updates = for{
         (nRow,nCol) <- neighbours(pos.row, pos.col, size)
         if isfree(nRow, nCol)
-        if dist+1 < distanceMap(nRow)(nCol)
-      } yield (Coord(nRow, nCol), dist+1)
+        if dist + 1 < distanceMap(nRow)(nCol)
+      } yield (Coord(nRow, nCol), dist + 1)
       updates
     }
 
@@ -86,7 +75,7 @@ object Distance {
   }
 
 
-  def directionsWithVisibility(view: BotView, pos: Coord) = {
+  def directionsWithVisibility(view: BotView, pos: Coord): List[(Coord, Int)] = {
     val directions = Distance.directions
     directions map (d => (d, view.visibility(pos, d) ) )
   }

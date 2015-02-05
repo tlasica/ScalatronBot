@@ -28,9 +28,13 @@ class HarvesterMiniBot(val apocalypse: Int) extends Bot {
       val moveReturn = returnToMaster(reactCmd, facts, returnVisibilityLimit)
       //val random = randoMove(reactCmd, facts)
       if (forceReturn(reactCmd.energy) && moveReturn.isDefined) moveReturn.get :: List( StatusCommand(status+"[fr]") )
-      if (moveForGoods.isDefined) moveForGoods.get :: List( StatusCommand(status+"[h]") )
-      else if (moveEscapeSnorgs.isDefined) moveEscapeSnorgs.get :: List( StatusCommand(status+"[s]") )
-      else if (moveReturn.isDefined) moveReturn.get :: List( StatusCommand(status+"[r]") )
+      if (moveForGoods.isDefined) {
+        moveForGoods.get :: List( StatusCommand(status+"[h]") ) }
+      else if (moveEscapeSnorgs.isDefined) {
+        moveEscapeSnorgs.get :: List( StatusCommand(status+"[s]") ) }
+      else if (moveReturn.isDefined) {
+        moveReturn.get :: List( StatusCommand(status+"[r]") )
+      }
       else {
         val escapeDir = prepareEscape(reactCmd.view)
         val escapeSteps = 17
@@ -40,7 +44,6 @@ class HarvesterMiniBot(val apocalypse: Int) extends Bot {
     }
   }
 
-  //TODO: jeśli master jest widoczny należy zrobić ruch w jego kierunku
   private def returnToMaster(cmd: ReactCmd, facts: List[ViewFact], visLimit: Int): Option[BotCommand] = {
     val master = cmd.masterPosition.get
     val masterDist = Math.round(Math.sqrt(master.row*master.row + master.col*master.col))
@@ -55,7 +58,9 @@ class HarvesterMiniBot(val apocalypse: Int) extends Bot {
       } yield dir
       if (visibleDirs.nonEmpty) Some(MoveCommand(visibleDirs.head)) else None
     }
-    else None
+    else {
+      None
+    }
   }
 
 
@@ -79,7 +84,9 @@ class HarvesterMiniBot(val apocalypse: Int) extends Bot {
       val available = (move :: similar) filter ( (x:Coord) => BotView.isSafe( cmd.view.at( MiniPosition.coord.add(x) ) ) )
       if ( available.nonEmpty ) Some(MoveCommand(available.head)) else None
     }
-    else None
+    else {
+      None
+    }
   }
 
   private def escapeSnorgs(cmd: ReactCmd, facts: List[ViewFact]): Option[BotCommand] = {
@@ -95,7 +102,9 @@ class HarvesterMiniBot(val apocalypse: Int) extends Bot {
       } yield d
       if (safeDirections.nonEmpty) Some(MoveCommand(safeDirections.head)) else Some(ExplodeCommand(3))
     }
-    else None
+    else {
+      None
+    }
   }
 
   private def prepareEscape(view: BotView): Coord = {
@@ -116,7 +125,9 @@ class HarvesterMiniBot(val apocalypse: Int) extends Bot {
       val bestDirs = options filter ( (x:(Coord, Long)) => x._2 == minWeight)
       Some(MoveCommand(bestDirs.head._1))
     }
-    else None
+    else {
+      None
+    }
   }
 
 }

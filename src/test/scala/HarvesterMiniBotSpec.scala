@@ -19,7 +19,7 @@ class HarvesterMiniBotSpec extends WordSpec with Matchers {
       }
       builder.add(BotView.Snorg, 11, 10)
       val cmd = reactWithView( builder.createString )
-      val bot = new HarvesterMiniBot
+      val bot = new HarvesterMiniBot(5000)
       val answer = bot.react( cmd )
       answer.head shouldBe MoveCommand(Coord(0,1))
       println(answer.mkString(";"))
@@ -32,7 +32,7 @@ class HarvesterMiniBotSpec extends WordSpec with Matchers {
         builder.add(BotView.Wall, i, 9)
       }
       val cmd = reactWithView( builder.createString )
-      val bot = new HarvesterMiniBot
+      val bot = new HarvesterMiniBot(5000)
       val answer = bot.react( cmd )
       //answer.head shouldBe MoveCommand(Coord(0,1))
       println(answer.mkString(";"))

@@ -2,15 +2,17 @@ case class ViewFact(what: Char, coord: Coord, distance: Int)
 
 case class BotView(str: String) {
 
-  //TODO: eliminate one of the at() methods and use Coords in all functions
+  private val MasterView = 31
+  private val MiniView = 21
 
   // Master Bot view is 31x31, mini-bot view is 21x21
-  require(str.length==BotView.MasterViewNumCells || str.length==BotView.MiniViewNumCells)
+  require(str.length == BotView.MasterViewSize * BotView.MasterViewSize ||
+          str.length == BotView.MiniViewSize * BotView.MiniViewSize)
 
-  def size = if (str.length == 31*31) 31 else 21
+  val size = BotView.viewSize(str)
 
   // 0..30 x 0.30, (0,0) upper left corner
-  def at(row: Int, col: Int) = {
+  def at(row: Int, col: Int): Char = {
     require(row>=0 && row<size)
     require(col>=0 && col<size)
     val idx = row * size + col
@@ -72,9 +74,9 @@ case class BotView(str: String) {
 object BotViewPrinter {
 
   def square(viewStr: String): String = {
-    val size = if (viewStr.length == 31*31) 31 else 21
+    val size = BotView.viewSize(viewStr)
     val withIndex = viewStr.zipWithIndex
-    val rows = withIndex map ( ci => if ((ci._2+1) % size == 0) ci._1 + "\n" else ci._1 )
+    val rows = withIndex map ( ci => if ((ci._2 + 1) % size == 0) ci._1 + "\n" else ci._1 )
     rows.mkString
   }
 
@@ -95,11 +97,11 @@ object BotView {
   val Fluppet = 'B'
   val Snorg = 'b'
 
-  val MasterviewSize = 31
+  val MasterViewSize = 31
   val MiniViewSize = 21
 
-  val MasterViewNumCells = MasterviewSize * MasterviewSize
-  val MiniViewNumCells = MiniViewSize * MiniViewSize
+  //lazy val MasterViewNumCells = MasterviewSize * MasterviewSize
+  //lazy val MiniViewNumCells = MiniViewSize * MiniViewSize
 
   def isInteresting(what: Char): Boolean = what match {
     case Hidden => false
@@ -118,19 +120,20 @@ object BotView {
     }
   }
 
+  def viewSize(str: String): Int = {
+    if (str.length == MasterViewSize * MasterViewSize) MasterViewSize else MiniViewSize
+  }
+
 }
 
 object MasterPosition {
-  def row = 15
-  def col = 15
-  def coord = Coord(15, 15)
+  val row = 15
+  val col = 15
+  val coord = Coord(row, col)
 }
 
 object MiniPosition {
-  def row = 10
-  def col = 10
-  def coord = Coord(10, 10)
+  val row = 10
+  val col = 10
+  val coord = Coord(row, col)
 }
-
-// TODO: method at(x,y) may be replaced with apply
-// TODO: what to do with invalid views

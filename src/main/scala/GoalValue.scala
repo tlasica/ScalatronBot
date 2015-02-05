@@ -1,6 +1,3 @@
-/**
- * Created by tomek on 17.01.15.
- */
 object GoalValue {
 
   // 0..100
@@ -14,11 +11,14 @@ object GoalValue {
 
   //  map ((x:Int) => BotView.MasterviewSize-x)
   private def cellValue(cell: Char, dist: Int) : Long = {
+    def wallValue: Int = {
+      if (dist == 0) -300
+      else if (dist == -1) -1
+      else 0
+    }
+
     cell match {
-      case BotView.Wall =>
-        if (dist == 0) -300
-        if (dist == 1) -1
-        else 0
+      case BotView.Wall => wallValue
       case BotView.Master => 0
       case BotView.EnemyMaster => -100 * distanceValue(dist)
       case BotView.EnemyMini => -300 * distanceValue(dist)
