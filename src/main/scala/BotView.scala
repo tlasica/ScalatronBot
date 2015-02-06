@@ -26,8 +26,8 @@ case class BotView(str: String) {
   }
 
   def find(what: Char): List[Coord] = {
-    val filteredWithIndex = str.zipWithIndex filter (_._1 == what)
-    filteredWithIndex map (x => toCoord(x._2)) toList
+    val filteredWithIndex = str.zipWithIndex filter { case(c:Char, idx) => c == what }
+    filteredWithIndex map { case (c, idx) => toCoord(idx) } toList
   }
 
   def factsWithDistance(from: Coord): List[ViewFact] = {

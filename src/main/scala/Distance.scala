@@ -66,7 +66,7 @@ object Distance {
       for(col <- Range(0, size)) {
         if ( ! isfree(row, col) ) {
           val nearby = neighbours(row, col, size)
-          val d = nearby map ( (x: (Int, Int)) => distanceMap(x._1)(x._2) )
+          val d = nearby map { case(row:Int, col:Int) => distanceMap(row)(col) }
           distanceMap(row)(col) = 1 + d.min
         }
       }
@@ -82,8 +82,8 @@ object Distance {
 
   def mostVisibleDirection(view: BotView, pos: Coord): (Coord, Int) = {
     val all = directionsWithVisibility(view, pos)
-    val bestVis = all map ( (x:(Coord,Int)) => x._2) max
-    val bestDirs = all filter ( (x:(Coord,Int)) => x._2 == bestVis)
+    val bestView = all map { case(_, dist:Int) => dist } max
+    val bestDirs = all filter { case(_, dist:Int) => dist == bestView }
     val best = util.Random.shuffle(bestDirs).head
     best
   }

@@ -5,12 +5,12 @@ import scala.collection.mutable
  */
 class HarvesterMiniBot(val apocalypse: Int) extends Bot {
 
-  private def forceReturn(energy: Int) = energy > 2000
-  private def worthReturn(energy: Int) = energy > 1000
+  private[this] def forceReturn(energy: Int) = energy > 2000
+  private[this] def worthReturn(energy: Int) = energy > 1000
 
-  private def statusString(cmd:ReactCmd) = "%s[%d]".format(cmd.name, cmd.energy)
+  private[this] def statusString(cmd:ReactCmd) = "%s[%d]".format(cmd.name, cmd.energy)
 
-  private var escape = Escape(MiniPosition.coord)
+  private[this] val escape = Escape(MiniPosition.coord)
 
   override def react(reactCmd: ReactCmd): List[BotCommand] = {
     super.react(reactCmd)
@@ -43,7 +43,7 @@ class HarvesterMiniBot(val apocalypse: Int) extends Bot {
     }
   }
 
-  private def returnToMaster(cmd: ReactCmd, facts: List[ViewFact], visLimit: Int): Option[BotCommand] = {
+  private[this] def returnToMaster(cmd: ReactCmd, facts: List[ViewFact], visLimit: Int): Option[BotCommand] = {
     val master = cmd.masterPosition.get
     if ( worthReturn(cmd.energy) ) {
       val move = Coord(math.signum(master.col).toInt, math.signum(master.row).toInt)
@@ -62,7 +62,7 @@ class HarvesterMiniBot(val apocalypse: Int) extends Bot {
   }
 
 
-  private def randoMove(cmd: ReactCmd, facts: List[ViewFact]): Option[BotCommand] = {
+  private[this] def randoMove(cmd: ReactCmd, facts: List[ViewFact]): Option[BotCommand] = {
     val safeDirections = for{
       d <- Distance.directions
       n = MiniPosition.coord.add(d)
@@ -72,7 +72,7 @@ class HarvesterMiniBot(val apocalypse: Int) extends Bot {
   }
 
 
-  private def moveToNearestGood(cmd: ReactCmd, facts:List[ViewFact]): Option[BotCommand] = {
+  private[this] def moveToNearestGood(cmd: ReactCmd, facts:List[ViewFact]): Option[BotCommand] = {
     val eatable = facts filter ((f:ViewFact) => f.what == BotView.Zugar || f.what == BotView.Fluppet )
     if (eatable.nonEmpty) {
       val best = eatable.sortWith( _.distance < _.distance ).head
@@ -87,7 +87,7 @@ class HarvesterMiniBot(val apocalypse: Int) extends Bot {
     }
   }
 
-  private def escapeSnorgs(cmd: ReactCmd, facts: List[ViewFact]): Option[BotCommand] = {
+  private[this] def escapeSnorgs(cmd: ReactCmd, facts: List[ViewFact]): Option[BotCommand] = {
     val nearSnorgs = facts filter ((f:ViewFact) => f.what == BotView.Snorg && f.distance<3 )
     if (nearSnorgs.nonEmpty) {
       val approachingFrom = nearSnorgs map ( (f:ViewFact) => MiniPosition.coord.findDirTo(f.coord) )
@@ -105,27 +105,9 @@ class HarvesterMiniBot(val apocalypse: Int) extends Bot {
     }
   }
 
-  private def prepareEscape(view: BotView): Coord = {
+  private[this] def prepareEscape(view: BotView): Coord = {
     val (bestDir, bestVis) = Distance.mostVisibleDirection(view, MiniPosition.coord)
     bestDir
-  }
-
-  private def escapeFromWalls(view: BotView): Option[BotCommand] = {
-    val options = for{
-      dir <- Distance.directions
-      dest = MiniPosition.coord.add(dir)
-      if BotView.isSafe(view.at(dest))
-      wallsWeight = view.walls(dest) map ((x:ViewFact) => math.round(100.0*(21.0-x.distance)/21.0)) sum
-    } yield (dir, wallsWeight)
-    if (options.nonEmpty) {
-      println("escape from walls options: " + options.mkString(";"))
-      val minWeight = options map ((x:(Coord, Long)) => x._2) min
-      val bestDirs = options filter ( (x:(Coord, Long)) => x._2 == minWeight)
-      Some(MoveCommand(bestDirs.head._1))
-    }
-    else {
-      None
-    }
   }
 
 }

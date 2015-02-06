@@ -42,7 +42,7 @@ object GoalValue {
     val distanceXY = Distance.calculateDistanceArray(view, pos)
     val distanceVector = distanceXY.flatten
     val viewWithDistance = view.toString().toCharArray zip distanceVector
-    val productVector = viewWithDistance map ( (x:(Char,Int)) => cellValue(x._1, x._2) )
+    val productVector = viewWithDistance map { case(what:Char, dist:Int) => cellValue(what, dist) }
     productVector.sum
   }
 
