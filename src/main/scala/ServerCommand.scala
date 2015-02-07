@@ -8,7 +8,7 @@ case class Coord(row: Int, col: Int) {
   def opposite = Coord(-row, -col)
 
   def isOpposite(m: Coord): Boolean =  {
-    if (row == -m.row && col == -m.col) true else false
+    row == -m.row && col == -m.col
   }
 
   def findMoveTo(dest: Coord): Coord = {

@@ -18,9 +18,9 @@ object Distance {
     } yield(nr, nc)
   }
 
-  def calculateDistanceArray(view: BotView, center:Coord): Array[Array[Int]] = {
+  def calculateMap(view: BotView, center:Coord): Array[Array[Int]] = {
     val ground = groundFromView(view)
-    calculateDistanceArray(ground, center)
+    calculateMap(ground, center)
   }
 
   /**
@@ -28,7 +28,7 @@ object Distance {
    * @param ground
    * @param start
    */
-  def calculateDistanceArray(ground: Array[Array[Boolean]], center:Coord): Array[Array[Int]] = {
+  def calculateMap(ground: Array[Array[Boolean]], center:Coord): Array[Array[Int]] = {
     val size = ground.length
     val distanceMap = Array.fill(size, size)(Int.MaxValue)
     def isfree(row: Int, col:Int): Boolean = ground(row)(col)
@@ -43,8 +43,7 @@ object Distance {
       updates
     }
 
-    import scala.collection.mutable.Queue
-    val waiting = new Queue[Coord]()
+    val waiting = new scala.collection.mutable.Queue[Coord]()
 
     // push start point to start visiting nodes
     distanceMap(center.row)(center.col) = 0
@@ -89,8 +88,8 @@ object Distance {
   }
 
 
-  private def groundFromView(view: BotView): Array[Array[Boolean]] = {
-    val groundLine = view.toString().toCharArray map ( (x:Char) => if (x==BotView.Wall) false else true )
+  private[this] def groundFromView(view: BotView): Array[Array[Boolean]] = {
+    val groundLine = view.toString().toCharArray map ( (x:Char) => x != BotView.Wall )
     Array.tabulate(view.size, view.size)( (x,y) => groundLine(x*view.size + y) )
   }
 

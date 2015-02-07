@@ -3,15 +3,15 @@
  */
 case class Escape(pos: Coord) {
 
-  private var escapeDir: Option[Coord] = None
-  private var escapeSteps: Int = 0
+  private[this] var escapeDir: Option[Coord] = None
+  private[this] var escapeSteps: Int = 0
 
   def start(dir:Coord, steps:Int): Unit = {
     escapeDir = Some(dir)
     escapeSteps = steps
   }
 
-  private def stop(): Unit = {
+  private[this] def stop(): Unit = {
     escapeDir = None
     escapeSteps = 0
   }
@@ -28,7 +28,7 @@ case class Escape(pos: Coord) {
     res
   }
 
-  private def nextMove: Option[MoveCommand] = {
+  private[this] def nextMove: Option[MoveCommand] = {
     require(escapeSteps > 0 && escapeDir.isDefined)
     escapeSteps = escapeSteps - 1
     Some(MoveCommand(escapeDir.get))

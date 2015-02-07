@@ -21,13 +21,13 @@ class GoalFunDrivenBot extends Bot {
 
   var lastMove: Coord = Coord(0,0)
 
-  private var escape = Escape(MasterPosition.coord)
+  private[this] val escape = Escape(MasterPosition.coord)
 
   /**
    * If there are many near snorgs visible and no mini is already visible then
    * a new MiniBot is spawn in the direction oppostite to the next move of MasterBot
    */
-  private def spawnGuardianIfsnorgsApproaching(cmd: ReactCmd, facts: List[ViewFact], move: MoveCommand) = {
+  private[this] def spawnGuardianIfsnorgsApproaching(cmd: ReactCmd, facts: List[ViewFact], move: MoveCommand) = {
     val snorgs = facts filter ( (f:ViewFact) => f.what == BotView.Snorg && f.distance<=5 )
     val minis = facts filter ( (f:ViewFact) => f.what == BotView.Mini && f.distance<10 )
     if (minis.isEmpty && snorgs.size>=3) {
@@ -40,7 +40,7 @@ class GoalFunDrivenBot extends Bot {
     else List()
   }
 
-  private def spawnHarvesterMiniBot(cmd: ReactCmd, facts: List[ViewFact], move: MoveCommand) = {
+  private[this] def spawnHarvesterMiniBot(cmd: ReactCmd, facts: List[ViewFact], move: MoveCommand) = {
     val fluppets = facts filter ((f:ViewFact) => f.what == BotView.Fluppet)
     val zugars = facts filter ((f:ViewFact) => f.what == BotView.Zugar)
     val nearMinis = facts filter ( (f:ViewFact) => f.what == BotView.Mini && f.distance<8 )
@@ -76,7 +76,7 @@ class GoalFunDrivenBot extends Bot {
     debug("Current val:" + bestValue)
     val neighbours = Distance.neighbours(MasterPosition.row, MasterPosition.col, 31)
     var bestMove = Coord(0, 0)  // do not move at all
-    val availableNeighbours = neighbours filter ( (x:(Int, Int)) => view.at(x._1, x._2) != BotView.Wall)
+    val availableNeighbours = neighbours filter { case (row, col) => view.at(row, col) != BotView.Wall }
     for(n <- availableNeighbours) {
       val newPos:Coord = Coord(n._1, n._2)
       val move = MasterPosition.coord.findMoveTo(newPos)
@@ -107,12 +107,12 @@ class GoalFunDrivenBot extends Bot {
     MoveCommand(bestMove)
   }
 
-  private def prepareEscape(view: BotView): Coord = {
+  private[this] def prepareEscape(view: BotView): Coord = {
     val (bestDir, bestVis) = Distance.mostVisibleDirection(view, MasterPosition.coord)
     bestDir
   }
 
-  private def statusString(cmd: ReactCmd) : String = {
+  private[this] def statusString(cmd: ReactCmd) : String = {
     "time:%d, energy:%d".format(cmd.time, cmd.energy)
   }
 

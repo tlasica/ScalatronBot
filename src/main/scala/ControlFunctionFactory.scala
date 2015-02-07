@@ -1,6 +1,3 @@
-/**
- * Created by tomek on 11.01.15.
- */
 class ControlFunctionFactory {
   def create = new BotManager().respond _
 }
@@ -44,8 +41,9 @@ class BotManager {
       response.mkString("|")
     }
     catch {
-      case e:Throwable =>
-        println("Fuck! " + e.getMessage)
+      // FIXME: NonFatal will be a better option, but it is not supported in scala 2.9.x
+      case e: Throwable =>
+        println("Ops! > " + e.getMessage)
         e.printStackTrace()
     }
   }

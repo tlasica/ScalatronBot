@@ -1,6 +1,4 @@
-abstract class BotCommand {
-
-}
+abstract class BotCommand
 
 case class MoveCommand(dir: Coord) extends BotCommand {
   override def toString: String = "Move(direction=%d:%d)".format(dir.col, dir.row)

@@ -5,7 +5,7 @@ import org.scalatest.{WordSpec, Matchers}
  */
 class HarvesterMiniBotSpec extends WordSpec with Matchers {
 
-  private def reactWithView(view: String): ReactCmd = {
+  private[this] def reactWithView(view: String): ReactCmd = {
     val params = Map("view" -> view, "master"->"0:0")
     ReactCmd( params )
   }

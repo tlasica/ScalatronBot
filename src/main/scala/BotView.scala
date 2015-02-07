@@ -2,9 +2,6 @@ case class ViewFact(what: Char, coord: Coord, distance: Int)
 
 case class BotView(str: String) {
 
-  private val MasterView = 31
-  private val MiniView = 21
-
   // Master Bot view is 31x31, mini-bot view is 21x21
   require(str.length == BotView.MasterViewSize * BotView.MasterViewSize ||
           str.length == BotView.MiniViewSize * BotView.MiniViewSize)
@@ -31,8 +28,8 @@ case class BotView(str: String) {
   }
 
   def factsWithDistance(from: Coord): List[ViewFact] = {
-    val distanceMap = Distance.calculateDistanceArray(this, from)
-    val interestingWithIndex = str.zipWithIndex filter ( (x:(Char,Int)) => BotView.isInteresting(x._1))
+    val distanceMap = Distance.calculateMap(this, from)
+    val interestingWithIndex = str.zipWithIndex filter { case (what, idx) => BotView.isInteresting(what) }
     val res = for{
       (what, idx) <- interestingWithIndex
       coord = toCoord(idx)
@@ -42,10 +39,10 @@ case class BotView(str: String) {
   }
 
   def walls(from: Coord): List[ViewFact] = {
-    val distanceMap = Distance.calculateDistanceArray(this, from)
-    val interestingWithIndex = str.zipWithIndex filter ( (x:(Char,Int)) => x._1==BotView.Wall)
+    val distanceMap = Distance.calculateMap(this, from)
+    val wallsWithIndex = str.zipWithIndex filter { case (what, idx) => what == BotView.Wall }
     val res = for{
-      (what, idx) <- interestingWithIndex
+      (what, idx) <- wallsWithIndex
       coord = toCoord(idx)
       dist = distanceMap(coord.row)(coord.col)
     } yield ViewFact(what, coord, dist)
@@ -55,10 +52,9 @@ case class BotView(str: String) {
 
 
   def visibility(from: Coord, dir: Coord): Int = {
-    import BotView.isSafe
     var newPos = from.add(dir)
     var vis = 0
-    while (isPositionCorrect(newPos) && isSafe(at(newPos)) ) {
+    while (isPositionCorrect(newPos) && BotView.isSafe(at(newPos)) ) {
       vis += 1
       newPos = newPos.add(dir)
     }
@@ -67,7 +63,7 @@ case class BotView(str: String) {
 
   override def toString(): String = str
 
-  private def toCoord(idx: Int) = Coord(idx / size, idx % size)
+  private[this] def toCoord(idx: Int) = Coord(idx / size, idx % size)
 }
 
 
@@ -75,8 +71,8 @@ object BotViewPrinter {
 
   def square(viewStr: String): String = {
     val size = BotView.viewSize(viewStr)
-    val withIndex = viewStr.zipWithIndex
-    val rows = withIndex map ( ci => if ((ci._2 + 1) % size == 0) ci._1 + "\n" else ci._1 )
+    val strWithIndex = viewStr.zipWithIndex
+    val rows = strWithIndex map { case (c, idx) => if ((idx + 1) % size == 0) c + "\n" else c }
     rows.mkString
   }
 

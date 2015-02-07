@@ -30,7 +30,7 @@ object ServerCommandParser {
     ParsedCommand(optcode, paramsMap)
   }
 
-  private def parseWelcome(cmd: ParsedCommand): ServerCommand = {
+  private[this] def parseWelcome(cmd: ParsedCommand): ServerCommand = {
     WelcomeCmd(
       name = cmd.getString("name"),
       apocalypse = cmd.getInt("apocalypse"),
@@ -38,11 +38,11 @@ object ServerCommandParser {
       maxSlaves = cmd.getInt("maxslaves") ) // TODO: do poprawienia na Option
   }
 
-  private def parseReact(cmd: ParsedCommand): ServerCommand = {
+  private[this] def parseReact(cmd: ParsedCommand): ServerCommand = {
     ReactCmd( cmd.params )
   }
 
-  private def parseGoodbye(cmd: ParsedCommand): ServerCommand = {
+  private[this] def parseGoodbye(cmd: ParsedCommand): ServerCommand = {
     GoodbyeCmd(energy = cmd.getInt("energy"))
   }
 }

@@ -24,10 +24,10 @@ object GoalValue {
     }
   }
 
-  private def wallValue(dist: Int): Long = {
-    if (dist == 0) -300
-    else if (dist == -1) -1
-    else 0
+  private def wallValue(dist: Int): Long =  dist match {
+    case 0  => -300
+    case -1 => -1
+    case _  => 0
   }
 
   private def snorgValue(dist: Int): Long = {
@@ -39,7 +39,7 @@ object GoalValue {
   }
 
   def forView(view: BotView, pos: Coord): Long = {
-    val distanceXY = Distance.calculateDistanceArray(view, pos)
+    val distanceXY = Distance.calculateMap(view, pos)
     val distanceVector = distanceXY.flatten
     val viewWithDistance = view.toString().toCharArray zip distanceVector
     val productVector = viewWithDistance map { case(what:Char, dist:Int) => cellValue(what, dist) }
@@ -52,7 +52,7 @@ object GoalValue {
       else ""
     }
 
-    val distance = Distance.calculateDistanceArray(view, Coord(row, col))
+    val distance = Distance.calculateMap(view, Coord(row, col))
     val sit = for {
       r <- Range(0, 31)
       c <- Range(0, 31)
