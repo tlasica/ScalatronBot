@@ -11,24 +11,23 @@ case class Escape(pos: Coord) {
     escapeSteps = steps
   }
 
-  private[this] def stop(): Unit = {
+  private[this] def stop(): Option[MoveCommand] = {
     escapeDir = None
     escapeSteps = 0
+    None
   }
 
-  def move(view: BotView): Option[MoveCommand] = {
-    var res: Option[MoveCommand] = None
-    if (escapeDir.isDefined) {
-      val dest = pos add escapeDir.get
-      if ( escapeSteps>0 && view.at(dest) == BotView.Empty ) {
-        res = nextMove
-      }
+  def move(view: BotView): Option[MoveCommand] = escapeDir match {
+    case Some(move) =>
+      val dest = pos add move
+      val isDestFree = view.at(dest) == BotView.Empty
+      if (escapeSteps > 0 && isDestFree )  nextMove()
       else stop()
-    }
-    res
+    case None => None
+
   }
 
-  private[this] def nextMove: Option[MoveCommand] = {
+  private[this] def nextMove(): Option[MoveCommand] = {
     require(escapeSteps > 0 && escapeDir.isDefined)
     escapeSteps = escapeSteps - 1
     Some(MoveCommand(escapeDir.get))

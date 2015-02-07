@@ -5,13 +5,9 @@
 abstract class Bot {
 
   def react(reactCmd: ReactCmd): List[BotCommand] = {
-    energy = reactCmd.energy
-    timestamp = reactCmd.time
     List()
   }
 
-  var energy: Int = 0
-  var timestamp: Int = 0
 }
 
 
@@ -71,40 +67,45 @@ class GoalFunDrivenBot extends Bot {
   }
 
   def moveForBestValue(reactCmd: ReactCmd, facts: List[ViewFact]): MoveCommand = {
-      val view = reactCmd.view
-    var bestValue = GoalValue.forView( view, MasterPosition.coord )
-    debug("Current val:" + bestValue)
-    val neighbours = Distance.neighbours(MasterPosition.row, MasterPosition.col, 31)
-    var bestMove = Coord(0, 0)  // do not move at all
-    val availableNeighbours = neighbours filter { case (row, col) => view.at(row, col) != BotView.Wall }
-    for(n <- availableNeighbours) {
-      val newPos:Coord = Coord(n._1, n._2)
-      val move = MasterPosition.coord.findMoveTo(newPos)
-      if (! move.isOpposite(lastMove)) {
-        val value = GoalValue.forView(view, newPos)
-        debug( "move by " + move + " will lead to " + value + " and situation:")
-        debug( GoalValue.situation(view, newPos.row, newPos.col).mkString("\n"))
-        if (value > bestValue) {
-          bestMove = move
-          bestValue = value
+
+    def bestMove(destinations: List[Coord], bestValSoFar: Long, bestMoveSoFar: Coord): Coord = destinations match {
+      case List() => bestMoveSoFar
+      case d :: rest =>
+        val move = MasterPosition.coord.findMoveTo(d)
+        if (! move.isOpposite(lastMove)) {
+          val value = GoalValue.forView(reactCmd.view, d)
+          debug( "move by " + move + " will lead to " + value + " and situation:")
+          debug( GoalValue.situation(reactCmd.view, d.row, d.col).mkString("\n"))
+          val betterVal = value max bestValSoFar
+          val betterMove = if (value > bestValSoFar) move else bestMoveSoFar
+          bestMove(rest, betterVal, betterMove)
         }
-      }
+        else bestMove(rest, bestValSoFar, bestMoveSoFar)
     }
 
+    val currValue = GoalValue.forView( reactCmd.view, MasterPosition.coord )
+    debug("Current val:" + currValue)
+    val neighbours = Distance.neighbours(MasterPosition.row, MasterPosition.col, BotView.MasterViewSize)
+    val availableNeighbours = neighbours filter { case (row, col) => reactCmd.view.at(row, col) != BotView.Wall }
+    val destCoords = availableNeighbours map { case (row, col) => Coord(row, col) }
+    val best = bestMove(destCoords, currValue, Coord(0,0))
+
     // if decided to stay and not to move we switch to escape mode
-    val noMoveFound = bestMove == Coord(0,0)
+    val noMoveFound = best == Coord(0, 0)
     val nothingInteresting = facts.isEmpty
     if (noMoveFound || nothingInteresting) {
       val escapeDir = prepareEscape(reactCmd.view)
       val escapeSteps = 17
       escape.start(escapeDir, escapeSteps)
-      bestMove = Coord(0,0)
+      printDebug()
+      lastMove = Coord(0, 0)
+      MoveCommand(Coord(0,0))
     }
-
-    lastMove = bestMove
-    debug("decision: " + bestMove)
-    printDebug()
-    MoveCommand(bestMove)
+    else {
+      printDebug()
+      lastMove = best
+      MoveCommand(best)
+    }
   }
 
   private[this] def prepareEscape(view: BotView): Coord = {
