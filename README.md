@@ -17,6 +17,7 @@ MasterBot follows simple algorithm:
 
 # Harvester Mini Bot
 
+0. if only 500 rounds left return to Master  (enforced)
 1. if energy is very high => try to return to Master, else
 2. if sth to harvest is near => go and harvest, else
 3. if snorgs are approaching => try to escape, else
