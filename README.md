@@ -1,6 +1,8 @@
 # ScalatronBot
 Bot for the [Scalatron game](http://scalatron.github.io/).
 
+[![Codacy Badge](https://www.codacy.com/project/badge/7235c120ec9b4a9aac1a81beac0080f7)](https://www.codacy.com/public/tlasica/ScalatronBot)
+
 # Master Bot
 
 MasterBot follows simple algorithm:
