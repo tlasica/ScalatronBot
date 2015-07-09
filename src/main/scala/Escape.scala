@@ -27,6 +27,8 @@ case class Escape(pos: Coord) {
 
   }
 
+  def isStarted = (escapeSteps>0)
+
   private[this] def nextMove(): Option[MoveCommand] = {
     require(escapeSteps > 0 && escapeDir.isDefined)
     escapeSteps = escapeSteps - 1

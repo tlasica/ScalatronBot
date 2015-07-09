@@ -5,6 +5,7 @@ import scala.collection.mutable
  */
 class HarvesterMiniBot(val apocalypse: Int) extends Bot {
 
+
   private[this] def forceReturn(energy: Int) = energy > 2000
   private[this] def worthReturn(energy: Int) = energy > 1000
 
@@ -42,6 +43,8 @@ class HarvesterMiniBot(val apocalypse: Int) extends Bot {
       }
     }
   }
+
+  def isEscapeStarted = escape.isStarted
 
   private[this] def returnToMaster(cmd: ReactCmd, facts: List[ViewFact], visLimit: Int): Option[BotCommand] = {
     val master = cmd.masterPosition.get

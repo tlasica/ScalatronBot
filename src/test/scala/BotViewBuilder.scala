@@ -18,4 +18,12 @@ class BotViewBuilder(size: Int) {
     view(idx) = what
   }
 
+  def addRow(what: Char, row: Int) = {
+    Range(0,size) foreach {add(what, row, _)}
+  }
+
+  def addCol(what: Char, col: Int) =  {
+    Range(0,size) foreach {add(what, _, col)}
+  }
+
 }

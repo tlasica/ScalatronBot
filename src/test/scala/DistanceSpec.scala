@@ -65,7 +65,7 @@ class DistanceSpec extends WordSpec with Matchers {
       val d30 = GoalValue.distanceValue(30)
       d0 shouldBe 1000
       d30 shouldBe 0
-      for(i <- Range(0, 30)) println( GoalValue.distanceValue(i) )
+      //for(i <- Range(0, 30)) println( GoalValue.distanceValue(i) )
     }
   }
 

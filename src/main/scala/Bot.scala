@@ -97,12 +97,12 @@ class GoalFunDrivenBot extends Bot {
       val escapeDir = prepareEscape(reactCmd.view)
       val escapeSteps = 17
       escape.start(escapeDir, escapeSteps)
-      printDebug()
+      //printDebug()
       lastMove = Coord(0, 0)
       MoveCommand(Coord(0,0))
     }
     else {
-      printDebug()
+      //printDebug()
       lastMove = best
       MoveCommand(best)
     }
