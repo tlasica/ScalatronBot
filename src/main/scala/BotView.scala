@@ -1,3 +1,5 @@
+import scala.annotation.tailrec
+
 case class ViewFact(what: Char, coord: Coord, distance: Int)
 
 case class BotView(str: String) {
@@ -52,13 +54,12 @@ case class BotView(str: String) {
 
 
   def visibility(from: Coord, dir: Coord): Int = {
-    var newPos = from.add(dir)
-    var vis = 0
-    while (isPositionCorrect(newPos) && BotView.isSafe(at(newPos)) ) {
-      vis += 1
-      newPos = newPos.add(dir)
+    @tailrec
+    def vis(pos: Coord, acc: Int): Int = {
+      if (isPositionCorrect(pos) && BotView.isSafe(at(pos))) vis(pos.add(dir), acc+1)
+      else acc
     }
-    vis
+    vis(from.add(dir), 0)
   }
 
   override def toString(): String = str
