@@ -1,4 +1,5 @@
 import scala.collection.mutable
+import scala.util.control.NonFatal
 
 class ControlFunctionFactory {
   def create = new BotManager().respond _
@@ -47,10 +48,9 @@ class BotManager {
       response.mkString("|")
     }
     catch {
-      // FIXME: NonFatal will be a better option, but it is not supported in scala 2.9.x
-      case e: Throwable =>
-        println("Ops! > " + e.getMessage)
-        e.printStackTrace()
+      case NonFatal(exc) =>
+        println("Ops! > " + exc.getMessage)
+        exc.printStackTrace()
     }
   }
 

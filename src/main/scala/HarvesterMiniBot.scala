@@ -17,30 +17,30 @@ class HarvesterMiniBot(val apocalypse: Int) extends Bot {
     super.react(reactCmd)
     val status = statusString(reactCmd)
     val esc = escape.move(reactCmd.view)
-    if (esc.isDefined) {
-      List(esc.get, StatusCommand(status + "[e]"))
-    }
-    else {
-      val facts = reactCmd.view.factsWithDistance(MiniPosition.coord)
-      val moveForGoods = moveToNearestGood(reactCmd, facts)
-      val moveEscapeSnorgs = escapeSnorgs(reactCmd, facts)
+    esc match {
+      case Some(move) =>
+        List(move, StatusCommand(status + "[e]"))
+      case None =>
+        val facts = reactCmd.view.factsWithDistance(MiniPosition.coord)
+        val moveForGoods = moveToNearestGood(reactCmd, facts)
+        val moveEscapeSnorgs = escapeSnorgs(reactCmd, facts)
 
-      val returnVisibilityLimit = if (reactCmd.time>(apocalypse - 500)) 5 else 15
-      val moveReturn = returnToMaster(reactCmd, facts, returnVisibilityLimit)
-      if (forceReturn(reactCmd.energy) && moveReturn.isDefined) moveReturn.get :: List( StatusCommand(status + "[fr]") )
-      if (moveForGoods.isDefined) {
-        moveForGoods.get :: List( StatusCommand(status + "[h]") ) }
-      else if (moveEscapeSnorgs.isDefined) {
-        moveEscapeSnorgs.get :: List( StatusCommand(status + "[s]") ) }
-      else if (moveReturn.isDefined) {
-        moveReturn.get :: List( StatusCommand(status + "[r]") )
-      }
-      else {
-        val escapeDir = prepareEscape(reactCmd.view)
-        val escapeSteps = 17
-        escape.start(escapeDir, escapeSteps)
-        List()
-      }
+        val returnVisibilityLimit = if (reactCmd.time>(apocalypse - 500)) 5 else 15
+        val moveReturn = returnToMaster(reactCmd, facts, returnVisibilityLimit)
+        val forcedToReturn = forceReturn(reactCmd.energy)
+
+        (forcedToReturn, moveReturn, moveForGoods, moveEscapeSnorgs) match {
+
+          case (true, Some(move), _, _) => List(move, StatusCommand(status + "[r!]") )
+          case (_, _, Some(move), _) => List(move, StatusCommand(status + "[h]") )
+          case (_, _, _, Some(move)) => List(move, StatusCommand(status + "[s]") )
+          case (_, Some(move), _, _) => List(move, StatusCommand(status + "[r]") )
+          case _ =>
+            val escapeDir = prepareEscape(reactCmd.view)
+            val escapeSteps = 17
+            escape.start(escapeDir, escapeSteps)
+            List()
+        }
     }
   }
 

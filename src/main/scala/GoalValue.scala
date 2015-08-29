@@ -9,7 +9,7 @@ object GoalValue {
   }
 
 
-  private def cellValue(cell: Char, dist: Int) : Long = {
+  private[this] def cellValue(cell: Char, dist: Int) : Long = {
     cell match {
       case BotView.Wall => wallValue(dist)
       case BotView.Master => 0
@@ -24,17 +24,17 @@ object GoalValue {
     }
   }
 
-  private def wallValue(dist: Int): Long =  dist match {
+  private[this] def wallValue(dist: Int): Long =  dist match {
     case 0  => -300
     case -1 => -1
     case _  => 0
   }
 
-  private def snorgValue(dist: Int): Long = {
+  private[this] def snorgValue(dist: Int): Long = {
     if (dist==0) -300000L else -250 * distanceValue(dist)
   }
 
-  private def fluppetValue(dist: Int): Long = {
+  private[this] def fluppetValue(dist: Int): Long = {
     if (dist==0) 500000L else 200 * distanceValue(dist)
   }
 

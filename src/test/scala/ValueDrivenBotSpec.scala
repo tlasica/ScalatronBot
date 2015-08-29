@@ -5,7 +5,7 @@ import org.scalatest.{WordSpec, Matchers}
  */
 class ValueDrivenBotSpec extends WordSpec with Matchers {
 
-  private def reactWithView(view: String): ReactCmd = {
+  private [this] def reactWithView(view: String): ReactCmd = {
     val params = Map("view" -> view)
     ReactCmd( params )
   }

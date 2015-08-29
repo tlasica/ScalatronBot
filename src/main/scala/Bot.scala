@@ -54,12 +54,9 @@ class GoalFunDrivenBot extends Bot {
   override def react(reactCmd: ReactCmd): List[BotCommand] = {
     val facts = reactCmd.view.factsWithDistance(MasterPosition.coord)
     val esc = escape.move(reactCmd.view)
-    val move =
-    if (esc.isDefined) {
-      esc.get
-    }
-    else {
-      moveForBestValue(reactCmd, facts)
+    val move = esc match {
+      case Some(m) => m
+      case None => moveForBestValue(reactCmd, facts)
     }
     val spawnGuards = spawnGuardianIfsnorgsApproaching(reactCmd, facts, move )
     val spawnHarvesters = spawnHarvesterMiniBot(reactCmd, facts, move )
